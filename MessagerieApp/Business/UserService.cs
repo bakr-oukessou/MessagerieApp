@@ -13,7 +13,7 @@ namespace MessagerieApp.Business
 
             user.Nom = updatedUser.Nom;
             user.Prenom = updatedUser.Prenom;
-            user.DateNaissance = updatedUser.DateNaissance;
+            user.DateNaissance = updatedUser.Date_naissance;
             user.Niveau = updatedUser.Niveau;
             user.Filiere = updatedUser.Filiere;
 
