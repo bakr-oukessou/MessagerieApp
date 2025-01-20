@@ -6,8 +6,8 @@
         public string Nom { get; set; }
         public string Code { get; set; }
         public int? ResponsableId { get; set; }
-        public Utilisateur Responsable { get; set; }
-        public List<Utilisateur> Membres { get; set; }
+        public User Responsable { get; set; }
+        public List<User> Membres { get; set; }
         public List<Ressource> Ressources { get; set; }
     }
 }

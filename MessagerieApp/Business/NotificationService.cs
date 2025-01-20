@@ -6,11 +6,11 @@ namespace MessagerieApp.Business
     public class NotificationService
     {
         private readonly NotificationRepository _notificationRepository;
-        private readonly UtilisateurRepository _utilisateurRepository;
+        private readonly UserRepository _utilisateurRepository;
 
         public NotificationService(
             NotificationRepository notificationRepository,
-            UtilisateurRepository utilisateurRepository)
+            UserRepository utilisateurRepository)
         {
             _notificationRepository = notificationRepository;
             _utilisateurRepository = utilisateurRepository;
@@ -66,5 +66,9 @@ namespace MessagerieApp.Business
                     Corps = "Votre offre n'a pas été retenue pour cette période.",
                     Type = NotificationType.Rejet,
                     Statut = StatutNotification.NonLue,
-                    DateCreation
-                }
+                    DateCreation = DateTime.Now
+                };
+            }
+        }
+    }
+}

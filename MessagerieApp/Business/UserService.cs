@@ -1,54 +1,58 @@
 ﻿using MessagerieApp.Models;
+using MessagerieApp.Repository;
+using System.Collections.Generic;
+using System.Text;
 
 namespace MessagerieApp.Business
 {
-    public class UserService
+    public class UserService : IUserService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IUserRepository _userRepository;
 
-        public async Task<User> UpdateProfile(int userId, User updatedUser)
+        public UserService(IUser Repository userRepository)
         {
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null) return null;
-
-            user.Nom = updatedUser.Nom;
-            user.Prenom = updatedUser.Prenom;
-            user.DateNaissance = updatedUser.Date_naissance;
-            user.Niveau = updatedUser.Niveau;
-            user.Filiere = updatedUser.Filiere;
-
-            await _context.SaveChangesAsync();
-            return user;
+            _userRepository = userRepository;
         }
 
-        public async Task<Contact> AddContact(int userId, int contactUserId, string groupeName = null)
+        public async Task RegisterUser Async(RegisterViewModel model)
         {
-            var contact = new Contact
+            var user = new Utilisateur
             {
-                UserId = userId,
-                ContactUserId = contactUserId,
-                GroupeName = groupeName ?? "Défaut"
+                Username = model.Username,
+                Password = HashPassword(model.Password),
+                Nom = model.Nom,
+                Prenom = model.Prenom,
+                DateNaissance = model.DateNaissance,
+                Niveau = model.Niveau,
+                Filiere = model.Filiere
             };
 
-            _context.Contacts.Add(contact);
-            await _context.SaveChangesAsync();
-            return contact;
+            await _userRepository.AddUser Async(user);
         }
 
-        public async Task<List<Contact>> GetUserContacts(int userId)
+        public async Task<Utilisateur> LoginUser Async(LoginViewModel model)
         {
-            return await _context.Contacts
-                .Where(c => c.UserId == userId)
-                .Include(c => c.ContactUser)
-                .ToListAsync();
+            var user = await _userRepository.GetUser ByUsernameAsync(model.Username);
+            if (user != null && VerifyPassword(model.Password, user.Password))
+            {
+                return user;
+            }
+            return null;
         }
 
-        public async Task<List<Contact>> GetContactsByGroup(int userId, string groupeName)
+        private string HashPassword(string password)
         {
-            return await _context.Contacts
-                .Where(c => c.UserId == userId && c.GroupeName == groupeName)
-                .Include(c => c.ContactUser)
-                .ToListAsync();
+            using (var sha256 = SHA256.Create())
+            {
+                var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                return Convert.ToBase64String(bytes);
+            }
+        }
+
+        private bool VerifyPassword(string password, string storedHash)
+        {
+            var hash = HashPassword(password);
+            return hash == storedHash;
         }
     }
 }
