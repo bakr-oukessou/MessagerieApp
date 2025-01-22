@@ -4,20 +4,17 @@ namespace MessagerieApp.Models
 {
     public class Ressource
     {
-        [Key]
-        public int Id { get; set; }
-
-        [Required]
-        public string Nom { get; set; }
-
-        [Required]
-        public string Type { get; set; } // Ordinateur, Imprimante
-
-        public string Marque { get; set; }
-
-        public DateTime DateAcquisition { get; set; }
-
-        public int DepartementId { get; set; }
-        public Departement Departement { get; set; }
+        public string Id { get; set; }
+        public string InventoryNumber { get; set; }
+        public string Type { get; set; }  // Computer or Printer
+        public string Brand { get; set; }
+        public string? DepartmentId { get; set; }
+        public string? AssignedToUserId { get; set; }
+        public DateTime AcquisitionDate { get; set; }
+        public DateTime? WarrantyEndDate { get; set; }
+        public string Status { get; set; }  // Active, UnderMaintenance, Disposed
+        public virtual Departement? Department { get; set; }
+        public virtual User? AssignedToUser { get; set; }
+        public virtual ICollection<ConstatMaintenance> MaintenanceHistory { get; set; }
     }
 }
