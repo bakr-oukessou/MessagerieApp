@@ -1,162 +1,288 @@
-﻿using MessagerieApp.Data;
+﻿using Dapper;
+using MessagerieApp.Data;
 using MessagerieApp.Models;
 using System.Data.SqlClient;
 
 namespace MessagerieApp.Repository
 {
-    public class RessourceRepository
+    public class RessourceRepository : IGenericRepository<Ressource>
     {
-        private readonly DatabaseConnection _dbConnection;
+        private readonly string _connectionString;
 
-        public RessourceRepository(DatabaseConnection dbConnection)
+        public RessourceRepository(IConfiguration configuration)
         {
-            _dbConnection = dbConnection;
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        // Méthode pour ajouter une ressource
-        public int AjouterRessource(Ressource ressource)
+        public async Task<Ressource> GetByIdAsync(int id)
         {
-            using (SqlConnection connection = _dbConnection.GetConnection())
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            // Fetch resource with additional type-specific details
+            var query = @"
+            SELECT r.*, 
+                   c.CPU, c.RAM, c.HardDrive, c.Screen,
+                   p.PrintSpeed, p.Resolution
+            FROM Ressources r
+            LEFT JOIN Computers c ON r.Id = c.RessourceId
+            LEFT JOIN Printers p ON r.Id = p.RessourceId
+            WHERE r.Id = @Id";
+
+            var result = await connection.QueryFirstOrDefaultAsync<dynamic>(query, new { Id = id });
+
+            if (result == null) return null;
+
+            var ressource = new Ressource
             {
-                string query = @"
+                Id = result.Id,
+                InventoryNumber = result.InventoryNumber,
+                Type = result.Type,
+                Brand = result.Brand,
+                DepartmentId = result.DepartmentId,
+                AssignedToUserId = result.AssignedToUserId,
+                AcquisitionDate = result.AcquisitionDate,
+                WarrantyEndDate = result.WarrantyEndDate,
+                Status = result.Status
+            };
+
+            // Add type-specific details
+            if (ressource.Type == "Computer")
+            {
+                ressource.ComputerDetails = new Computer
+                {
+                    CPU = result.CPU,
+                    RAM = result.RAM,
+                    HardDrive = result.HardDrive,
+                    Screen = result.Screen
+                };
+            }
+            else if (ressource.Type == "Printer")
+            {
+                ressource.ImprimanteDetails = new Imprimante
+                {
+                    PrintSpeed = result.PrintSpeed,
+                    Resolution = result.Resolution
+                };
+            }
+
+            return ressource;
+        }
+
+        public async Task<IEnumerable<Ressource>> GetAllAsync()
+        {
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            var query = @"
+            SELECT r.*, 
+                   c.CPU, c.RAM, c.HardDrive, c.Screen,
+                   p.PrintSpeed, p.Resolution
+            FROM Ressources r
+            LEFT JOIN Computers c ON r.Id = c.RessourceId
+            LEFT JOIN Printers p ON r.Id = p.RessourceId";
+
+            var results = await connection.QueryAsync<dynamic>(query);
+
+            var ressources = new List<Ressource>();
+            foreach (var result in results)
+            {
+                var ressource = new Ressource
+                {
+                    Id = result.Id,
+                    InventoryNumber = result.InventoryNumber,
+                    Type = result.Type,
+                    Brand = result.Brand,
+                    DepartmentId = result.DepartmentId,
+                    AssignedToUserId = result.AssignedToUserId,
+                    AcquisitionDate = result.AcquisitionDate,
+                    WarrantyEndDate = result.WarrantyEndDate,
+                    Status = result.Status
+                };
+
+                // Add type-specific details
+                if (ressource.Type == "Computer")
+                {
+                    ressource.ComputerDetails = new Computer
+                    {
+                        CPU = result.CPU,
+                        RAM = result.RAM,
+                        HardDrive = result.HardDrive,
+                        Screen = result.Screen
+                    };
+                }
+                else if (ressource.Type == "Printer")
+                {
+                    ressource.ImprimanteDetails = new Imprimante
+                    {
+                        PrintSpeed = result.PrintSpeed,
+                        Resolution = result.Resolution
+                    };
+                }
+
+                ressources.Add(ressource);
+            }
+
+            return ressources;
+        }
+
+        public async Task<int> AddAsync(Ressource entity)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+            using var transaction = connection.BeginTransaction();
+
+            try
+            {
+                // Insert into Ressources table
+                var ressourceQuery = @"
                 INSERT INTO Ressources 
-                (Nom, Type, Marque, DateAcquisition, DepartementId) 
+                (InventoryNumber, Type, Brand, DepartmentId, AssignedToUserId, 
+                AcquisitionDate, WarrantyEndDate, Status)
                 VALUES 
-                (@Nom, @Type, @Marque, @DateAcquisition, @DepartementId);
+                (@InventoryNumber, @Type, @Brand, @DepartmentId, @AssignedToUserId, 
+                @AcquisitionDate, @WarrantyEndDate, @Status);
                 SELECT SCOPE_IDENTITY();";
 
-                using (SqlCommand command = new SqlCommand(query, connection))
+                var ressourceId = await connection.ExecuteScalarAsync<int>(ressourceQuery, entity, transaction);
+
+                // Insert type-specific details
+                if (entity.Type == "Computer" && entity.ComputerDetails != null)
                 {
-                    command.Parameters.AddWithValue("@Nom", ressource.Nom);
-                    command.Parameters.AddWithValue("@Type", ressource.Type);
-                    command.Parameters.AddWithValue("@Marque", ressource.Marque);
-                    command.Parameters.AddWithValue("@DateAcquisition", ressource.DateAcquisition);
-                    command.Parameters.AddWithValue("@DepartementId", ressource.DepartementId);
+                    var computerQuery = @"
+                    INSERT INTO Computers 
+                    (RessourceId, CPU, RAM, HardDrive, Screen)
+                    VALUES 
+                    (@RessourceId, @CPU, @RAM, @HardDrive, @Screen)";
 
-                    connection.Open();
-                    return Convert.ToInt32(command.ExecuteScalar());
-                }
-            }
-        }
-
-        // Méthode pour obtenir toutes les ressources
-        public List<Ressource> ObtenirToutesLesRessources()
-        {
-            List<Ressource> ressources = new List<Ressource>();
-
-            using (SqlConnection connection = _dbConnection.GetConnection())
-            {
-                string query = "SELECT * FROM Ressources";
-
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {
-                    connection.Open();
-                    using (SqlDataReader reader = command.ExecuteReader())
+                    await connection.ExecuteAsync(computerQuery, new
                     {
-                        while (reader.Read())
-                        {
-                            ressources.Add(new Ressource
-                            {
-                                Id = Convert.ToInt32(reader["Id"]),
-                                Nom = reader["Nom"].ToString(),
-                                Type = reader["Type"].ToString(),
-                                Marque = reader["Marque"].ToString(),
-                                DateAcquisition = Convert.ToDateTime(reader["DateAcquisition"]),
-                                DepartementId = Convert.ToInt32(reader["DepartementId"])
-                            });
-                        }
-                    }
+                        RessourceId = ressourceId,
+                        entity.ComputerDetails.CPU,
+                        entity.ComputerDetails.RAM,
+                        entity.ComputerDetails.HardDrive,
+                        entity.ComputerDetails.Screen
+                    }, transaction);
                 }
-            }
+                else if (entity.Type == "Printer" && entity.ImprimanteDetails != null)
+                {
+                    var printerQuery = @"
+                    INSERT INTO Printers 
+                    (RessourceId, PrintSpeed, Resolution)
+                    VALUES 
+                    (@RessourceId, @PrintSpeed, @Resolution)";
 
-            return ressources;
+                    await connection.ExecuteAsync(printerQuery, new
+                    {
+                        RessourceId = ressourceId,
+                        entity.ImprimanteDetails.PrintSpeed,
+                        entity.ImprimanteDetails.Resolution
+                    }, transaction);
+                }
+
+                transaction.Commit();
+                return ressourceId;
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
         }
 
-        // Méthode pour mettre à jour une ressource
-        public bool ModifierRessource(Ressource ressource)
+        public async Task<bool> UpdateAsync(Ressource entity)
         {
-            using (SqlConnection connection = _dbConnection.GetConnection())
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+            using var transaction = connection.BeginTransaction();
+
+            try
             {
-                string query = @"
+                // Update Ressources table
+                var ressourceQuery = @"
                 UPDATE Ressources 
-                SET Nom = @Nom, 
+                SET InventoryNumber = @InventoryNumber, 
                     Type = @Type, 
-                    Marque = @Marque, 
-                    DateAcquisition = @DateAcquisition, 
-                    DepartementId = @DepartementId 
+                    Brand = @Brand, 
+                    DepartmentId = @DepartmentId, 
+                    AssignedToUserId = @AssignedToUserId, 
+                    AcquisitionDate = @AcquisitionDate, 
+                    WarrantyEndDate = @WarrantyEndDate, 
+                    Status = @Status
                 WHERE Id = @Id";
 
-                using (SqlCommand command = new SqlCommand(query, connection))
+                await connection.ExecuteAsync(ressourceQuery, entity, transaction);
+
+                // Update type-specific details
+                if (entity.Type == "Computer" && entity.ComputerDetails != null)
                 {
-                    command.Parameters.AddWithValue("@Id", ressource.Id);
-                    command.Parameters.AddWithValue("@Nom", ressource.Nom);
-                    command.Parameters.AddWithValue("@Type", ressource.Type);
-                    command.Parameters.AddWithValue("@Marque", ressource.Marque);
-                    command.Parameters.AddWithValue("@DateAcquisition", ressource.DateAcquisition);
-                    command.Parameters.AddWithValue("@DepartementId", ressource.DepartementId);
+                    var computerQuery = @"
+                    UPDATE Computers 
+                    SET CPU = @CPU, 
+                        RAM = @RAM, 
+                        HardDrive = @HardDrive, 
+                        Screen = @Screen
+                    WHERE RessourceId = @RessourceId";
 
-                    connection.Open();
-                    int rowsAffected = command.ExecuteNonQuery();
-                    return rowsAffected > 0;
-                }
-            }
-        }
-
-        // Méthode pour supprimer une ressource
-        public bool SupprimerRessource(int id)
-        {
-            using (SqlConnection connection = _dbConnection.GetConnection())
-            {
-                string query = "DELETE FROM Ressources WHERE Id = @Id";
-
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@Id", id);
-
-                    connection.Open();
-                    int rowsAffected = command.ExecuteNonQuery();
-                    return rowsAffected > 0;
-                }
-            }
-        }
-
-        // Méthode de recherche avec filtres
-        public List<Ressource> RechercherRessources(string critere)
-        {
-            List<Ressource> ressources = new List<Ressource>();
-
-            using (SqlConnection connection = _dbConnection.GetConnection())
-            {
-                string query = @"
-                SELECT * FROM Ressources 
-                WHERE Nom LIKE @Critere OR 
-                      Type LIKE @Critere OR 
-                      Marque LIKE @Critere";
-
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@Critere", $"%{critere}%");
-
-                    connection.Open();
-                    using (SqlDataReader reader = command.ExecuteReader())
+                    await connection.ExecuteAsync(computerQuery, new
                     {
-                        while (reader.Read())
-                        {
-                            ressources.Add(new Ressource
-                            {
-                                Id = Convert.ToInt32(reader["Id"]),
-                                Nom = reader["Nom"].ToString(),
-                                Type = reader["Type"].ToString(),
-                                Marque = reader["Marque"].ToString(),
-                                DateAcquisition = Convert.ToDateTime(reader["DateAcquisition"]),
-                                DepartementId = Convert.ToInt32(reader["DepartementId"])
-                            });
-                        }
-                    }
+                        RessourceId = entity.Id,
+                        entity.ComputerDetails.CPU,
+                        entity.ComputerDetails.RAM,
+                        entity.ComputerDetails.HardDrive,
+                        entity.ComputerDetails.Screen
+                    }, transaction);
                 }
-            }
+                else if (entity.Type == "Printer" && entity.ImprimanteDetails != null)
+                {
+                    var printerQuery = @"
+                    UPDATE Printers 
+                    SET PrintSpeed = @PrintSpeed, 
+                        Resolution = @Resolution
+                    WHERE RessourceId = @RessourceId";
 
-            return ressources;
+                    await connection.ExecuteAsync(printerQuery, new
+                    {
+                        RessourceId = entity.Id,
+                        entity.ImprimanteDetails.PrintSpeed,
+                        entity.ImprimanteDetails.Resolution
+                    }, transaction);
+                }
+
+                transaction.Commit();
+                return true;
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
+
+        public async Task<bool> DeleteAsync(int id)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+            using var transaction = connection.BeginTransaction();
+
+            try
+            {
+                // Delete type-specific details first
+                await connection.ExecuteAsync("DELETE FROM Computers WHERE RessourceId = @Id", new { Id = id }, transaction);
+                await connection.ExecuteAsync("DELETE FROM Printers WHERE RessourceId = @Id", new { Id = id }, transaction);
+
+                // Then delete from main Ressources table
+                var deleteQuery = "DELETE FROM Ressources WHERE Id = @Id";
+                await connection.ExecuteAsync(deleteQuery, new { Id = id }, transaction);
+
+                transaction.Commit();
+                return true;
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
         }
     }
 }
