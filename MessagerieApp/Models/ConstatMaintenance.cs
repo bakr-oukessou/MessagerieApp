@@ -2,10 +2,10 @@
 {
     public class ConstatMaintenance
     {
-        public string Id { get; set; }
-        public string ResourceId { get; set; }
-        public string ReportedByUserId { get; set; }
-        public string? TechnicianId { get; set; }
+        public int Id { get; set; }
+        public int ResourceId { get; set; }
+        public int ReportedByUserId { get; set; }
+        public int? TechnicianId { get; set; }
         public DateTime ReportDate { get; set; }
         public string IssueDescription { get; set; }
         public string Status { get; set; }  // Reported, InProgress, Diagnosed, Resolved, RequiresReplacement

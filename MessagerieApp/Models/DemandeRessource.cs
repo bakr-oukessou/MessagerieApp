@@ -2,8 +2,8 @@
 {
     public class DemandeRessource
     {
-        public string Id { get; set; }
-        public string DepartmentId { get; set; }
+        public int Id { get; set; }
+        public int DepartmentId { get; set; }
         public DateTime RequestDate { get; set; }
         public string Status { get; set; }  // Draft, Submitted, Approved, Rejected
         public virtual Departement Department { get; set; }

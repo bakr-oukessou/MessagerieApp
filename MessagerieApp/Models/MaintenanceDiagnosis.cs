@@ -1,6 +1,6 @@
 ﻿namespace MessagerieApp.Models
 {
-    public class MaintenanceDiagnosis
+    public class MaintenanceDiagnosis:Ressource
     {
         public string Id { get; set; }
         public string MaintenanceTicketId { get; set; }

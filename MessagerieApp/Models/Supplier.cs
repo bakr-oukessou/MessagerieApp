@@ -2,7 +2,7 @@
 {
     public class Supplier
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
         public string CompanyName { get; set; }
         public string Location { get; set; }
         public string Address { get; set; }
@@ -10,6 +10,6 @@
         public string ManagerName { get; set; }
         public bool IsBlacklisted { get; set; }
         public string? BlacklistReason { get; set; }
-        public virtual ICollection<AppelOffres> Bids { get; set; }
+        public virtual ICollection<AppelOffres> Offres { get; set; }
     }
 }
