@@ -1,0 +1,51 @@
+﻿@page
+@model OffresModel
+@{
+    ViewData["Title"] = "Offers Management";
+}
+
+<h2>Offers Management</h2>
+
+<form method="post">
+    <div>
+        <label for="SupplierId">Supplier ID:</label>
+        <input type="text" id="SupplierId" name="SupplierId" />
+    </div>
+    <div>
+        <label for="AppelOffresId">Appel d'Offres ID:</label>
+        <input type="text" id="AppelOffresId" name="AppelOffresId" />
+    </div>
+    <div>
+        <label for="Price">Price:</label>
+        <input type="text" id="Price" name="Price" />
+    </div>
+    <div>
+        <label for="DeliveryDate">Delivery Date:</label>
+        <input type="date" id="DeliveryDate" name="DeliveryDate" />
+    </div>
+    <button type="submit">Add Offer</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Supplier ID</th>
+            <th>Appel d'Offres ID</th>
+            <th>Price</th>
+            <th>Delivery Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var offre in Model.OffresList)
+        {
+            <tr>
+                <td>@offre.Id</td>
+                <td>@offre.SupplierId</td>
+                <td>@offre.AppelOffresId</td>
+                <td>@offre.Price</td>
+                <td>@offre.DeliveryDate</td>
+            </tr>
+        }
+    </tbody>
+</table>

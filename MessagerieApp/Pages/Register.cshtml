@@ -1,26 +1,35 @@
 ﻿@page
-@model WebApplicationA1.Pages.RegisterModel
+@model RegisterModel
 @{
-    var today = DateTime.Now.ToShortDateString();
+    ViewData["Title"] = "Register";
 }
-<h1 class="text-white bg-primary">Registration</h1>
-<h6>@today</h6>
-<form method="post" class="col-4 offset-4">
+
+<h1>Register</h1>
+
+<form method="post">
     <div class="form-group">
-        <label class="control-label">Login</label>
-        <input type="text" asp-for="Compte.Login" class="form-control" />
-        <span asp-validation-for="Compte.Login" class="text-danger"></span>
+        <label for="Name">Name</label>
+        <input type="text" asp-for="Register.Name" class="form-control" />
+        <span asp-validation-for="Register.Name" class="text-danger"></span>
     </div>
+
     <div class="form-group">
-        <label class="control-label">Password</label>
-        <input type="password" asp-for="Compte.Password" class="form-control" />
-        <span asp-validation-for="Compte.Password" class="text-danger"></span>
+        <label for="Email">Email</label>
+        <input type="email" asp-for="Register.Email" class="form-control" />
+        <span asp-validation-for="Register.Email" class="text-danger"></span>
     </div>
 
-    <div class="text-light bg-primary">@Model.Msg</div>
-
-    <div>
-        <button type="submit" class="btn btn-success ">Register</button>
+    <div class="form-group">
+        <label for="Password">Password</label>
+        <input type="password" asp-for="Register.Password" class="form-control" />
+        <span asp-validation-for="Register.Password" class="text-danger"></span>
     </div>
 
+    <div class="form-group">
+        <label for="ConfirmPassword">Confirm Password</label>
+        <input type="password" asp-for="Register.ConfirmPassword" class="form-control" />
+        <span asp-validation-for="Register.ConfirmPassword" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Register</button>
 </form>

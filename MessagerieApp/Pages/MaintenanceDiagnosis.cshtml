@@ -1,0 +1,45 @@
+﻿@page
+@model MaintenanceDiagnosisModel
+@{
+    ViewData["Title"] = "Maintenance Diagnosis Management";
+}
+
+<h2>Maintenance Diagnosis Management</h2>
+
+<form method="post">
+    <div>
+        <label for="ResourceId">Resource ID:</label>
+        <input type="text" id="ResourceId" name="ResourceId" />
+    </div>
+    <div>
+        <label for="Diagnosis">Diagnosis:</label>
+        <textarea id="Diagnosis" name="Diagnosis"></textarea>
+    </div>
+    <div>
+        <label for="TechnicianId">Technician ID:</label>
+        <input type="text" id="TechnicianId" name="TechnicianId" />
+    </div>
+    <button type="submit">Add Diagnosis</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Resource ID</th>
+            <th>Diagnosis</th>
+            <th>Technician ID</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var diagnosis in Model.MaintenanceDiagnosisList)
+        {
+            <tr>
+                <td>@diagnosis.Id</td>
+                <td>@diagnosis.Frequency</td>
+                <td>@diagnosis.Diagnosis</td>
+                <td>@diagnosis.TechnicianId</td>
+            </tr>
+        }
+    </tbody>
+</table>

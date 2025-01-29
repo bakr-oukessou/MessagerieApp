@@ -1,0 +1,48 @@
+﻿@page
+@model DemandeRessourceModel
+@{
+    ViewData["Title"] = "Resource Request Management";
+}
+
+<h2>Resource Request Management</h2>
+
+<form method="post">
+    <div>
+        <label for="TeacherId">Teacher ID:</label>
+        <input type="text" id="TeacherId" name="TeacherId" />
+    </div>
+    <div>
+        <label for="ResourceType">Resource Type:</label>
+        <select id="ResourceType" name="ResourceType">
+            <option value="Computer">Computer</option>
+            <option value="Printer">Printer</option>
+        </select>
+    </div>
+    <div>
+        <label for="Quantity">Quantity:</label>
+        <input type="number" id="Quantity" name="Quantity" />
+    </div>
+    <button type="submit">Add Request</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Teacher ID</th>
+            <th>Resource Type</th>
+            <th>Quantity</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var demande in Model.DemandeRessourceList)
+        {
+            <tr>
+                <td>@demande.Id</td>
+                <td>@demande.TeacherId</td>
+                <td>@demande.ResourceType</td>
+                <td>@demande.Quantity</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,39 @@
+﻿@page
+@model DashboardModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h1>Dashboard</h1>
+
+<h2>Besoins</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Description</th>
+            <th>Quantité</th>
+            <th>Date Soumission</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var besoin in Model.Besoins)
+        {
+            <tr>
+                <td>@besoin.Id</td>
+                <td>@besoin.Description</td>
+                <td>@besoin.Quantite</td>
+                <td>@besoin.DateSoumission.ToShortDateString()</td>
+                <td>
+                    <a asp-page="/EditBesoin" asp-route-id="@besoin.Id" class="btn btn-sm btn-warning">Edit</a>
+                    <form method="post" asp-page-handler="Delete" asp-route-id="@besoin.Id" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-page="/CreateBesoin" class="btn btn-primary">Create New Besoin</a>

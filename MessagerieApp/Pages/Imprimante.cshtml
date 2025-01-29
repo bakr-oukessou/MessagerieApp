@@ -1,0 +1,45 @@
+﻿@page
+@model ImprimanteModel
+@{
+    ViewData["Title"] = "Printer Management";
+}
+
+<h2>Printer Management</h2>
+
+<form method="post">
+    <div>
+        <label for="Brand">Brand:</label>
+        <input type="text" id="Brand" name="Brand" />
+    </div>
+    <div>
+        <label for="PrintSpeed">Print Speed:</label>
+        <input type="text" id="PrintSpeed" name="PrintSpeed" />
+    </div>
+    <div>
+        <label for="Resolution">Resolution:</label>
+        <input type="text" id="Resolution" name="Resolution" />
+    </div>
+    <button type="submit">Add Printer</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Brand</th>
+            <th>Print Speed</th>
+            <th>Resolution</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var imprimante in Model.ImprimantesList)
+        {
+            <tr>
+                <td>@imprimante.Id</td>
+                <td>@imprimante.Brand</td>
+                <td>@imprimante.PrintSpeed</td>
+                <td>@imprimante.Resolution</td>
+            </tr>
+        }
+    </tbody>
+</table>

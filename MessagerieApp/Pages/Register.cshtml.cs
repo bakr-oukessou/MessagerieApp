@@ -1,44 +1,32 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using WebApplicationA1.Business;
-using WebApplicationA1.Models;
 
-namespace WebApplicationA1.Pages
+namespace MessagerieApp.Pages
 {
     public class RegisterModel : PageModel
     {
-        Account account;
-        string msg;
-        public Account Compte
-        {
-            get { return account; }
-            set { account = value; }
-        }
+        [BindProperty]
+        public RegisterInputModel Register { get; set; }
 
-        public string Msg { get => msg; set => msg = value; }
-
-        public void OnGet()
+        public async Task<IActionResult> OnPostAsync()
         {
-        
-        }
-        public IActionResult OnPost(Account Compte)
-        {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                AccountManager manager = new AccountManager();
-                
-                if (manager.Exist(Compte.Login)==false)
-                {
-                    manager.Add(Compte);
-                    Msg = "account added with success";
-                }
-
-                else
-                {
-                    Msg = "Account already exist!";
-                }
+                return Page();
             }
-            return Page();
+
+            // Call the AuthService to register the user
+            // Example: await _authService.RegisterAsync(new User { ... }, Register.Password);
+
+            return RedirectToPage("/Login");
+        }
+
+        public class RegisterInputModel
+        {
+            public string Name { get; set; }
+            public string Email { get; set; }
+            public string Password { get; set; }
+            public string ConfirmPassword { get; set; }
         }
     }
 }

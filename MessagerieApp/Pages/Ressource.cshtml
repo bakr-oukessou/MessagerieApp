@@ -1,0 +1,48 @@
+﻿@page
+@model RessourceModel
+@{
+    ViewData["Title"] = "Resource Management";
+}
+
+<h2>Resource Management</h2>
+
+<form method="post">
+    <div>
+        <label for="ResourceType">Resource Type:</label>
+        <select id="ResourceType" name="ResourceType">
+            <option value="Computer">Computer</option>
+            <option value="Printer">Printer</option>
+        </select>
+    </div>
+    <div>
+        <label for="ResourceId">Resource ID:</label>
+        <input type="text" id="ResourceId" name="ResourceId" />
+    </div>
+    <div>
+        <label for="DepartmentId">Department ID:</label>
+        <input type="text" id="DepartmentId" name="DepartmentId" />
+    </div>
+    <button type="submit">Add Resource</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Resource Type</th>
+            <th>Resource ID</th>
+            <th>Department ID</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var ressource in Model.RessourcesList)
+        {
+            <tr>
+                <td>@ressource.Id</td>
+                <td>@ressource.ResourceType</td>
+                <td>@ressource.ResourceId</td>
+                <td>@ressource.DepartmentId</td>
+            </tr>
+        }
+    </tbody>
+</table>

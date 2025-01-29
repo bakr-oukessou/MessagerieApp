@@ -1,0 +1,48 @@
+﻿@page
+@model AppelOffresItemModel
+@{
+    ViewData["Title"] = "Appel d'Offres Item Management";
+}
+
+<h2>Appel d'Offres Item Management</h2>
+
+<form method="post">
+    <div>
+        <label for="AppelOffresId">Appel d'Offres ID:</label>
+        <input type="text" id="AppelOffresId" name="AppelOffresId" />
+    </div>
+    <div>
+        <label for="ResourceType">Resource Type:</label>
+        <select id="ResourceType" name="ResourceType">
+            <option value="Computer">Computer</option>
+            <option value="Printer">Printer</option>
+        </select>
+    </div>
+    <div>
+        <label for="Quantity">Quantity:</label>
+        <input type="number" id="Quantity" name="Quantity" />
+    </div>
+    <button type="submit">Add Item</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Appel d'Offres ID</th>
+            <th>Resource Type</th>
+            <th>Quantity</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.AppelOffresItemList)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.AppelOffreID</td>
+                <td>@item.Type</td>
+                <td>@item.Quantity</td>
+            </tr>
+        }
+    </tbody>
+</table>

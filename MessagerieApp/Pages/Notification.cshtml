@@ -1,0 +1,39 @@
+﻿@page
+@model NotificationModel
+@{
+    ViewData["Title"] = "Notification Management";
+}
+
+<h2>Notification Management</h2>
+
+<form method="post">
+    <div>
+        <label for="UserId">User ID:</label>
+        <input type="text" id="UserId" name="UserId" />
+    </div>
+    <div>
+        <label for="Message">Message:</label>
+        <textarea id="Message" name="Message"></textarea>
+    </div>
+    <button type="submit">Send Notification</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>User ID</th>
+            <th>Message</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var notification in Model.NotificationsList)
+        {
+            <tr>
+                <td>@notification.Id</td>
+                <td>@notification.UserId</td>
+                <td>@notification.Message</td>
+            </tr>
+        }
+    </tbody>
+</table>

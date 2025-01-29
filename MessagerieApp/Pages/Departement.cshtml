@@ -1,0 +1,33 @@
+﻿@page
+@model DepartementModel
+@{
+    ViewData["Title"] = "Department Management";
+}
+
+<h2>Department Management</h2>
+
+<form method="post">
+    <div>
+        <label for="DepartmentName">Department Name:</label>
+        <input type="text" id="DepartmentName" name="DepartmentName" />
+    </div>
+    <button type="submit">Add Department</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Department Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var departement in Model.DepartementsList)
+        {
+            <tr>
+                <td>@departement.Id</td>
+                <td>@departement.DepartmentName</td>
+            </tr>
+        }
+    </tbody>
+</table>

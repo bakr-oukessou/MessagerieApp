@@ -1,0 +1,64 @@
+﻿@page
+@model ConstatMaintenanceModel
+@{
+    ViewData["Title"] = "Maintenance Management";
+}
+
+<h2>Maintenance Management</h2>
+
+<form method="post">
+    <div>
+        <label for="ResourceId">Resource ID:</label>
+        <input type="text" id="ResourceId" name="ResourceId" />
+    </div>
+    <div>
+        <label for="IssueDescription">Issue Description:</label>
+        <textarea id="IssueDescription" name="IssueDescription"></textarea>
+    </div>
+    <div>
+        <label for="IssueDate">Issue Date:</label>
+        <input type="date" id="IssueDate" name="IssueDate" />
+    </div>
+    <div>
+        <label for="Frequency">Frequency:</label>
+        <select id="Frequency" name="Frequency">
+            <option value="Rare">Rare</option>
+            <option value="Frequent">Frequent</option>
+            <option value="Permanent">Permanent</option>
+        </select>
+    </div>
+    <div>
+        <label for="IssueType">Issue Type:</label>
+        <select id="IssueType" name="IssueType">
+            <option value="Software">Software</option>
+            <option value="Hardware">Hardware</option>
+        </select>
+    </div>
+    <button type="submit">Report Issue</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Resource ID</th>
+            <th>Issue Description</th>
+            <th>Issue Date</th>
+            <th>Frequency</th>
+            <th>Issue Type</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var constat in Model.ConstatMaintenanceList)
+        {
+            <tr>
+                <td>@constat.Id</td>
+                <td>@constat.ResourceId</td>
+                <td>@constat.IssueDescription</td>
+                <td>@constat.ReportDate</td>
+                <td>@constat.Status</td>
+                <td>@constat.TechnicianId</td>
+            </tr>
+        }
+    </tbody>
+</table>

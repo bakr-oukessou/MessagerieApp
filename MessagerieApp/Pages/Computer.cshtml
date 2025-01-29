@@ -1,0 +1,57 @@
+﻿@page
+@model ComputerModel
+@{
+    ViewData["Title"] = "Computer Management";
+}
+
+<h2>Computer Management</h2>
+
+<form method="post">
+    <div>
+        <label for="Brand">Brand:</label>
+        <input type="text" id="Brand" name="Brand" />
+    </div>
+    <div>
+        <label for="CPU">CPU:</label>
+        <input type="text" id="CPU" name="CPU" />
+    </div>
+    <div>
+        <label for="RAM">RAM:</label>
+        <input type="text" id="RAM" name="RAM" />
+    </div>
+    <div>
+        <label for="HardDisk">Hard Disk:</label>
+        <input type="text" id="HardDisk" name="HardDisk" />
+    </div>
+    <div>
+        <label for="Screen">Screen:</label>
+        <input type="text" id="Screen" name="Screen" />
+    </div>
+    <button type="submit">Add Computer</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Brand</th>
+            <th>CPU</th>
+            <th>RAM</th>
+            <th>Hard Disk</th>
+            <th>Screen</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var computer in Model.ComputersList)
+        {
+            <tr>
+                <td>@computer.Id</td>
+                <td>@computer.Brand</td>
+                <td>@computer.CPU</td>
+                <td>@computer.RAM</td>
+                <td>@computer.HardDisk</td>
+                <td>@computer.Screen</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,39 @@
+﻿@page
+@model AppelOffresModel
+@{
+    ViewData["Title"] = "Appel d'Offres Management";
+}
+
+<h2>Appel d'Offres Management</h2>
+
+<form method="post">
+    <div>
+        <label for="StartDate">Start Date:</label>
+        <input type="date" id="StartDate" name="StartDate" />
+    </div>
+    <div>
+        <label for="EndDate">End Date:</label>
+        <input type="date" id="EndDate" name="EndDate" />
+    </div>
+    <button type="submit">Create Appel d'Offres</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var appelOffre in Model.AppelOffresList)
+        {
+            <tr>
+                <td>@appelOffre.Id</td>
+                <td>@appelOffre.StartDate</td>
+                <td>@appelOffre.EndDate</td>
+            </tr>
+        }
+    </tbody>
+</table>
