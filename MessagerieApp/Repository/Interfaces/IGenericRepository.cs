@@ -1,4 +1,4 @@
-﻿namespace MessagerieApp.Repository
+﻿namespace MessagerieApp.Repository.Interfaces
 {
     public interface IGenericRepository<T> where T : class
     {

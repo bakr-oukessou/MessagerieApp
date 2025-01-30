@@ -1,6 +1,6 @@
 ﻿using MessagerieApp.Models;
 
-namespace MessagerieApp.Repository
+namespace MessagerieApp.Repository.Interfaces
 {
     public interface IOffreRepository
     {

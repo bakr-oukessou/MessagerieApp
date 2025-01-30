@@ -1,4 +1,5 @@
-﻿using WebApplicationA1.Models;
+﻿using MessagerieApp.Business.Interfaces;
+using WebApplicationA1.Models;
 
 namespace WebApplicationA1.Business
 {

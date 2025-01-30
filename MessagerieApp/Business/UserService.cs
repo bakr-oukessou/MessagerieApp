@@ -1,58 +1,49 @@
 ﻿using MessagerieApp.Models;
-using MessagerieApp.Repository;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
+using MessagerieApp.Business;
+using MessagerieApp.Business.Interfaces;
+using MessagerieApp.Repository.Interfaces;
 
-namespace MessagerieApp.Business
+namespace MessagerieApp.Services
 {
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
 
-        public UserService(IUser Repository userRepository)
+        public UserService(IUserRepository userRepository)
         {
             _userRepository = userRepository;
         }
 
-        public async Task RegisterUser Async(RegisterViewModel model)
+        public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
-            var user = new Utilisateur
-            {
-                Username = model.Username,
-                Password = HashPassword(model.Password),
-                Nom = model.Nom,
-                Prenom = model.Prenom,
-                DateNaissance = model.DateNaissance,
-                Niveau = model.Niveau,
-                Filiere = model.Filiere
-            };
-
-            await _userRepository.AddUser Async(user);
+            return await _userRepository.GetAllUsersAsync();
         }
 
-        public async Task<Utilisateur> LoginUser Async(LoginViewModel model)
+        public async Task<User> GetUserByIdAsync(int id)
         {
-            var user = await _userRepository.GetUser ByUsernameAsync(model.Username);
-            if (user != null && VerifyPassword(model.Password, user.Password))
-            {
-                return user;
-            }
-            return null;
+            return await _userRepository.GetUserByIdAsync(id);
         }
 
-        private string HashPassword(string password)
+        public async Task<User> GetUserByEmailAsync(string email)
         {
-            using (var sha256 = SHA256.Create())
-            {
-                var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return Convert.ToBase64String(bytes);
-            }
+            return await _userRepository.GetUserByEmailAsync(email);
         }
 
-        private bool VerifyPassword(string password, string storedHash)
+        public async Task AddUserAsync(User user)
         {
-            var hash = HashPassword(password);
-            return hash == storedHash;
+            await _userRepository.AddUserAsync(user);
+        }
+
+        public async Task UpdateUserAsync(User user)
+        {
+            await _userRepository.UpdateUserAsync(user);
+        }
+
+        public async Task DeleteUserAsync(int id)
+        {
+            await _userRepository.DeleteUserAsync(id);
         }
     }
 }

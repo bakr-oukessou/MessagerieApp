@@ -1,6 +1,6 @@
 ﻿using MessagerieApp.Models;
 
-namespace MessagerieApp.Business
+namespace MessagerieApp.Business.Interfaces
 {
     public interface IOffreService
     {

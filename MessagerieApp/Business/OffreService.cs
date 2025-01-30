@@ -1,5 +1,6 @@
-﻿using MessagerieApp.Models;
-using MessagerieApp.Repository;
+﻿using MessagerieApp.Business.Interfaces;
+using MessagerieApp.Models;
+using MessagerieApp.Repository.Interfaces;
 
 namespace MessagerieApp.Business
 {
@@ -23,18 +24,15 @@ namespace MessagerieApp.Business
         {
             return _offreRepository.GetAllAsync();
         }
-
+  
         public Task<int> CreateOffreAsync(Offre offre)
         {
-            // Validate offre before creation
-            ValidateOffre(offre);
             return _offreRepository.CreateOffreAsync(offre);
         }
 
         public Task<bool> UpdateOffreAsync(Offre offre)
         {
             // Validate offre before update
-            ValidateOffre(offre);
             return _offreRepository.UpdateOffreAsync(offre);
         }
 
@@ -43,13 +41,13 @@ namespace MessagerieApp.Business
             return _offreRepository.DeleteOffreAsync(id);
         }
 
-        public Task<IEnumerable<AppelOffre>> GetAppelOffresByOffreIdAsync(int offreId)
+        public Task<IEnumerable<AppelOffres>> GetAppelOffresByOffreIdAsync(int offreId)
         {
             return _offreRepository.GetAppelOffresByOffreIdAsync(offreId);
         }
 
 
-        public Task<AppelOffres> SelectBestAppelOffreAsync(int offreId)
+        public async Task<AppelOffres> SelectBestAppelOffreAsync(int offreId)
         {
             var appelOffres = await GetAppelOffresByOffreIdAsync(offreId);
 
@@ -74,16 +72,15 @@ namespace MessagerieApp.Business
                 // Notify suppliers about their bid status
                 await _notificationService.CreateNotificationAsync(new Notification
                 {
-                    Message = $"Your bid for Offre {offreId} has been {appelOffre.Status}",
-                    RecipientId = appelOffre.SupplierId,
-                    CreatedAt = DateTime.UtcNow,
-                    IsRead = false,
-
+                    // Assuming Notification class has these properties
+                    // Adjust the property names according to your Notification class definition
+                    Corps = $"Your bid for Offre {offreId} has been {appelOffre.Status}",
+                    EmetteurId = appelOffre.FournisseurId,
+                    DateCreation = DateTime.UtcNow,
+                    Statut = StatutNotification.NonLue,
                 });
-
             }
             return bestAppelOffre;
-        
         }
     }
 }

@@ -1,6 +1,11 @@
-﻿using Dapper;
-using MessagerieApp.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
+using MessagerieApp.Models;
+using MessagerieApp.Repository.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace MessagerieApp.Repository
 {
@@ -15,278 +20,136 @@ namespace MessagerieApp.Repository
 
         public async Task<Offre> GetByIdAsync(int id, bool includeDetails = false)
         {
-            using var connection = new SqlConnection(_connectionString);
-            await connection.OpenAsync();
-
-            // Base Offre query
-            var query = @"
-            SELECT * FROM Offres 
-            WHERE Id = @Id";
-
-            var offre = await connection.QueryFirstOrDefaultAsync<Offre>(query, new { Id = id });
-
-            if (offre != null && includeDetails)
+            Offre offre = null;
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                // Fetch associated AppelOffres
-                var appelOffresQuery = @"
-                SELECT ao.*, f.CompanyName, f.Location 
-                FROM AppelOffres ao
-                JOIN Fournisseur f ON ao.FournisseurId = f.Id
-                WHERE ao.OffreId = @OffreId"
-                ;
-                offre.Offres = (await connection.QueryAsync<AppelOffres, Supplier, AppelOffres>(
-                appelOffresQuery,
-                    (appelOffre, fournisseur) => {
-                        appelOffre.Fournisseur = fournisseur;
-                        return appelOffre;
-                    },
-                    new { OffreId = id },
-                    splitOn: "CompanyName"
-                )).ToList();
-
-                // Fetch items for each AppelOffre
-                foreach (var appelOffre in offre.Offres)
+                await conn.OpenAsync();
+                string query = "SELECT * FROM Offres WHERE Id = @Id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    var itemsQuery = @"
-                    SELECT * FROM AppelOffreItems 
-                    WHERE AppelOffreId = @AppelOffreId"
-                    ;
-
-                    appelOffre.Items = (await connection.QueryAsync<AppelOffresItem>(
-                        itemsQuery,
-                        new { AppelOffreId = appelOffre.Id }
-                    )).ToList();
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            offre = new Offre
+                            {
+                                Id = reader.GetInt32("Id"),
+                                StartDate = reader.GetDateTime("StartDate"),
+                                EndDate = reader.GetDateTime("EndDate"),
+                                Status = reader.GetString("Status")
+                            };
+                        }
+                    }
                 }
             }
-
             return offre;
         }
 
         public async Task<IEnumerable<Offre>> GetAllAsync()
         {
-            using var connection = new SqlConnection(_connectionString);
-            await connection.OpenAsync();
-
-            return await connection.QueryAsync<Offre>("SELECT * FROM Offres");
+            List<Offre> offres = new List<Offre>();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                await conn.OpenAsync();
+                string query = "SELECT * FROM Offres";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            offres.Add(new Offre
+                            {
+                                Id = reader.GetInt32("Id"),
+                                StartDate = reader.GetDateTime("StartDate"),
+                                EndDate = reader.GetDateTime("EndDate"),
+                                Status = reader.GetString("Status")
+                            });
+                        }
+                    }
+                }
+            }
+            return offres;
         }
 
         public async Task<int> CreateOffreAsync(Offre offre)
         {
-            using var connection = new SqlConnection(_connectionString);
-            await connection.OpenAsync();
-            using var transaction = connection.BeginTransaction();
-
-            try
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                // Insert Offre
-                var offreQuery = @"
-                INSERT INTO Offres 
-                (StartDate, EndDate, Status) 
-                VALUES 
-                (@StartDate, @EndDate, @Status);
-                SELECT SCOPE_IDENTITY();";
-
-                var offreId = await connection.ExecuteScalarAsync<int>(offreQuery, offre, transaction);
-
-                // Insert AppelOffres if any
-                if (offre.Offres != null)
+                await conn.OpenAsync();
+                string query = "INSERT INTO Offres (StartDate, EndDate, Status) OUTPUT INSERTED.Id VALUES (@StartDate, @EndDate, @Status)";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    foreach (var appelOffre in offre.Offres)
-                    {
-                        appelOffre.OffreId = offreId;
-                        var appelOffreQuery = @"
-                        INSERT INTO AppelOffres 
-                        (OffreId, FournisseurId, SubmissionDate, 
-                        ProposedDeliveryDate, WarrantyMonths, TotalPrice, Status) 
-                        VALUES 
-                        (@OffreId, @FournisseurId, @SubmissionDate, 
-                        @ProposedDeliveryDate, @WarrantyMonths, @TotalPrice, @Status);
-                        SELECT SCOPE_IDENTITY();";
-
-                        var appelOffreId = await connection.ExecuteScalarAsync<int>(appelOffreQuery, appelOffre, transaction);
-
-                        // Insert AppelOffreItems
-                        if (appelOffre.Items != null)
-                        {
-                            foreach (var item in appelOffre.Items)
-                            {
-                                item.AppelOffreID = appelOffreId;
-                                var itemQuery = @"
-                                INSERT INTO AppelOffreItems 
-                                (AppelOffreId, Type, Marque, Specifications, 
-                                Quantity, UnitPrice) 
-                                VALUES 
-                                (@AppelOffreId, @Type, @Marque, @Specifications, 
-                                @Quantity, @UnitPrice)";
-
-                                await connection.ExecuteAsync(itemQuery, item, transaction);
-                            }
-                        }
-                    }
+                    cmd.Parameters.AddWithValue("@StartDate", offre.StartDate);
+                    cmd.Parameters.AddWithValue("@EndDate", offre.EndDate);
+                    cmd.Parameters.AddWithValue("@Status", offre.Status);
+                    return (int)await cmd.ExecuteScalarAsync();
                 }
-
-                transaction.Commit();
-                return offreId;
-            }
-            catch
-            {
-                transaction.Rollback();
-                throw;
             }
         }
 
         public async Task<bool> UpdateOffreAsync(Offre offre)
         {
-            using var connection = new SqlConnection(_connectionString);
-            await connection.OpenAsync();
-            using var transaction = connection.BeginTransaction();
-
-            try
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                // Update Offre
-                var offreQuery = @"
-                UPDATE Offres 
-                SET StartDate = @StartDate, 
-                    EndDate = @EndDate, 
-                    Status = @Status 
-                WHERE Id = @Id";
-
-                await connection.ExecuteAsync(offreQuery, offre, transaction);
-
-                // Delete existing AppelOffres and Items
-                await connection.ExecuteAsync(
-                    "DELETE FROM AppelOffreItems WHERE AppelOffreId IN (SELECT Id FROM AppelOffres WHERE OffreId = @OffreId)",
-                    new { OffreId = offre.Id },
-                    transaction
-                );
-                await connection.ExecuteAsync(
-                    "DELETE FROM AppelOffres WHERE OffreId = @OffreId",
-                    new { OffreId = offre.Id },
-                    transaction
-                );
-
-                // Reinsert AppelOffres
-                if (offre.Offres != null)
+                await conn.OpenAsync();
+                string query = "UPDATE Offres SET StartDate = @StartDate, EndDate = @EndDate, Status = @Status WHERE Id = @Id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    foreach (var appelOffre in offre.Offres)
-                    {
-                        appelOffre.OffreId = offre.Id;
-                        var appelOffreQuery = @"
-                        INSERT INTO AppelOffres 
-                        (OffreId, FournisseurId, SubmissionDate, 
-                        ProposedDeliveryDate, WarrantyMonths, TotalPrice, Status) 
-                        VALUES 
-                        (@OffreId, @FournisseurId, @SubmissionDate, 
-                        @ProposedDeliveryDate, @WarrantyMonths, @TotalPrice, @Status);
-                        SELECT SCOPE_IDENTITY();";
-
-                        var appelOffreId = await connection.ExecuteScalarAsync<int>(appelOffreQuery, appelOffre, transaction);
-
-                        // Insert AppelOffreItems
-                        if (appelOffre.Items != null)
-                        {
-                            foreach (var item in appelOffre.Items)
-                            {
-                                item.AppelOffreID = appelOffreId;
-                                var itemQuery = @"
-                                INSERT INTO AppelOffreItems 
-                                (AppelOffreId, Type, Marque, Specifications, 
-                                Quantity, UnitPrice) 
-                                VALUES 
-                                (@AppelOffreId, @Type, @Marque, @Specifications, 
-                                @Quantity, @UnitPrice)";
-
-                                await connection.ExecuteAsync(itemQuery, item, transaction);
-                            }
-                        }
-                    }
+                    cmd.Parameters.AddWithValue("@Id", offre.Id);
+                    cmd.Parameters.AddWithValue("@StartDate", offre.StartDate);
+                    cmd.Parameters.AddWithValue("@EndDate", offre.EndDate);
+                    cmd.Parameters.AddWithValue("@Status", offre.Status);
+                    return await cmd.ExecuteNonQueryAsync() > 0;
                 }
-
-                transaction.Commit();
-                return true;
-            }
-            catch
-            {
-                transaction.Rollback();
-                throw;
             }
         }
 
         public async Task<bool> DeleteOffreAsync(int id)
         {
-            using var connection = new SqlConnection(_connectionString);
-            await connection.OpenAsync();
-            using var transaction = connection.BeginTransaction();
-
-            try
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                // Delete AppelOffreItems
-                await connection.ExecuteAsync(
-                    "DELETE FROM AppelOffreItems WHERE AppelOffreId IN (SELECT Id FROM AppelOffres WHERE OffreId = @OffreId)",
-                    new { OffreId = id },
-                    transaction
-                );
-
-                // Delete AppelOffres
-                await connection.ExecuteAsync(
-                    "DELETE FROM AppelOffres WHERE OffreId = @OffreId",
-                    new { OffreId = id },
-                    transaction
-                );
-
-                // Delete Offre
-                await connection.ExecuteAsync(
-                    "DELETE FROM Offres WHERE Id = @Id",
-                    new { Id = id },
-                    transaction
-                );
-
-                transaction.Commit();
-                return true;
-            }
-            catch
-            {
-                transaction.Rollback();
-                throw;
+                await conn.OpenAsync();
+                string query = "DELETE FROM Offres WHERE Id = @Id";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    return await cmd.ExecuteNonQueryAsync() > 0;
+                }
             }
         }
 
         public async Task<IEnumerable<AppelOffres>> GetAppelOffresByOffreIdAsync(int offreId)
         {
-            using var connection = new SqlConnection(_connectionString);
-            await connection.OpenAsync();
-
-            var query = @"
-            SELECT ao.*, f.CompanyName, f.Location 
-            FROM AppelOffres ao
-            JOIN Fournisseur f ON ao.FournisseurId = f.Id
-            WHERE ao.OffreId = @OffreId"
-            ;
-            var appelOffres = await connection.QueryAsync<AppelOffres, Supplier, AppelOffres>(
-                query,
-                (appelOffre, fournisseur) => {
-                    appelOffre.Fournisseur = fournisseur;
-                    return appelOffre;
-                },
-                new { OffreId = offreId },
-                splitOn: "CompanyName"
-            );
-
-            // Fetch items for each AppelOffre
-            foreach (var appelOffre in appelOffres)
+            List<AppelOffres> appels = new List<AppelOffres>();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                var itemsQuery = @"
-                SELECT * FROM AppelOffreItems 
-                WHERE AppelOffreId = @AppelOffreId";
-
-                appelOffre.Items = (await connection.QueryAsync<AppelOffresItem>(
-                    itemsQuery,
-                    new { AppelOffreId = appelOffre.Id }
-                )).ToList();
+                await conn.OpenAsync();
+                string query = "SELECT * FROM AppelOffres WHERE OffreId = @OffreId";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@OffreId", offreId);
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            appels.Add(new AppelOffres
+                            {
+                                Id = reader.GetInt32("Id"),
+                                OffreId = reader.GetInt32("OffreId"),
+                                FournisseurId = reader.GetInt32("FournisseurId"),
+                                SubmissionDate = reader.GetDateTime("SubmissionDate"),
+                                ProposedDeliveryDate = reader.GetDateTime("ProposedDeliveryDate"),
+                                WarrantyMonths = reader.GetInt32("WarrantyMonths"),
+                                TotalPrice = reader.GetDecimal("TotalPrice"),
+                                Status = reader.GetString("Status")
+                            });
+                        }
+                    }
+                }
             }
-
-            return appelOffres;
+            return appels;
         }
-
     }
 }

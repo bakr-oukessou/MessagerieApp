@@ -1,6 +1,6 @@
 ﻿using WebApplicationA1.Models;
 
-namespace WebApplicationA1.Business
+namespace MessagerieApp.Business.Interfaces
 {
     public interface IAccountManager
     {

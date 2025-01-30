@@ -1,9 +1,11 @@
-﻿using MessagerieApp.Models;
+﻿using MessagerieApp.Business.Interfaces;
+using MessagerieApp.Models;
+using MessagerieApp.Repositories;
 using MessagerieApp.Repository;
 
 namespace MessagerieApp.Business
 {
-    public class NotificationService
+    public class NotificationService : INotificationService
     {
         private readonly NotificationRepository _notificationRepository;
         private readonly UserRepository _utilisateurRepository;
@@ -16,11 +18,21 @@ namespace MessagerieApp.Business
             _utilisateurRepository = utilisateurRepository;
         }
 
+        public Task AddNotificationAsync(Notification notification)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task CreateNotificationAsync(Notification notification)
+        {
+            throw new NotImplementedException();
+        }
+
         // Envoi de notification aux enseignants pour les besoins
         public void EnvoyerDemandeBesoinsAuxEnseignants(int chefDepartementId, int departementId)
         {
             // Récupérer tous les enseignants du département
-            var enseignants = _utilisateurRepository.ObtenirEnseignantsDuDepartement(departementId);
+            var enseignants = _utilisateurRepository.GetUserByIdAsync(departementId);
 
             foreach (var enseignant in enseignants)
             {
@@ -35,7 +47,7 @@ namespace MessagerieApp.Business
                     DateCreation = DateTime.Now
                 };
 
-                _notificationRepository.CreerNotification(notification);
+                _notificationRepository.AddNotificationAsync(notification);
             }
         }
 
@@ -53,7 +65,7 @@ namespace MessagerieApp.Business
                 Statut = StatutNotification.NonLue,
                 DateCreation = DateTime.Now
             };
-            _notificationRepository.CreerNotification(notificationAcceptation);
+            _notificationRepository.AddNotificationAsync(notificationAcceptation);
 
             // Notifications de rejet aux autres fournisseurs
             foreach (var fournisseurId in autresFournisseursId)
@@ -69,6 +81,21 @@ namespace MessagerieApp.Business
                     DateCreation = DateTime.Now
                 };
             }
+        }
+
+        public Task<List<Notification>> GetAllNotificationsAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Notification> GetNotificationByIdAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task MarkAsReadAsync(int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }

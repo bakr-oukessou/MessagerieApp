@@ -4,16 +4,39 @@ namespace MessagerieApp.Data
 {
     public class DatabaseConnection
     {
-        private string connectionString;
+        private readonly string _connectionString;
 
-        public DatabaseConnection(IConfiguration configuration)
+        public DatabaseConnection(string connectionString)
         {
-            connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = connectionString;
         }
 
-        public SqlConnection GetConnection()
+        public void TestConnection()
         {
-            return new SqlConnection(connectionString);
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    Console.WriteLine("Connexion réussie à la base de données !");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Erreur de connexion : {ex.Message}");
+                }
+            }
+        }
+
+        public void ExecuteQuery(string query)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+            }
         }
     }
 }
