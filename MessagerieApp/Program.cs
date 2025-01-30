@@ -51,6 +51,11 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.MapGet("/", async context =>
+{
+    context.Response.Redirect("/Dashboard");
+});
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();

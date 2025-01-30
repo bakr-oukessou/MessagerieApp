@@ -21,7 +21,7 @@ namespace MessagerieApp.Repositories
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
-                var command = new SqlCommand("SELECT * FROM MaintenanceDiagnoses", connection);
+                var command = new SqlCommand("SELECT * FROM MaintenanceDiagnosis", connection);
                 using (var reader = await command.ExecuteReaderAsync())
                 {
                     while (await reader.ReadAsync())
@@ -48,7 +48,7 @@ namespace MessagerieApp.Repositories
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
-                var command = new SqlCommand("SELECT * FROM MaintenanceDiagnoses WHERE Id = @Id", connection);
+                var command = new SqlCommand("SELECT * FROM MaintenanceDiagnosis WHERE Id = @Id", connection);
                 command.Parameters.AddWithValue("@Id", id);
 
                 using (var reader = await command.ExecuteReaderAsync())
@@ -78,7 +78,7 @@ namespace MessagerieApp.Repositories
             {
                 await connection.OpenAsync();
                 var command = new SqlCommand(
-                    "INSERT INTO MaintenanceDiagnoses (Id, MaintenanceTicketId, DiagnosisDate, ProblemDescription, Frequency, IssueType, RequiresReplacement) " +
+                    "INSERT INTO MaintenanceDiagnosis (Id, MaintenanceTicketId, DiagnosisDate, ProblemDescription, Frequency, IssueType, RequiresReplacement) " +
                     "VALUES (@Id, @MaintenanceTicketId, @DiagnosisDate, @ProblemDescription, @Frequency, @IssueType, @RequiresReplacement);",
                     connection);
 
@@ -100,7 +100,7 @@ namespace MessagerieApp.Repositories
             {
                 await connection.OpenAsync();
                 var command = new SqlCommand(
-                    "UPDATE MaintenanceDiagnoses SET MaintenanceTicketId = @MaintenanceTicketId, DiagnosisDate = @DiagnosisDate, " +
+                    "UPDATE MaintenanceDiagnosis SET MaintenanceTicketId = @MaintenanceTicketId, DiagnosisDate = @DiagnosisDate, " +
                     "ProblemDescription = @ProblemDescription, Frequency = @Frequency, IssueType = @IssueType, RequiresReplacement = @RequiresReplacement " +
                     "WHERE Id = @Id",
                     connection);
@@ -122,7 +122,7 @@ namespace MessagerieApp.Repositories
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
-                var command = new SqlCommand("DELETE FROM MaintenanceDiagnoses WHERE Id = @Id", connection);
+                var command = new SqlCommand("DELETE FROM MaintenanceDiagnosis WHERE Id = @Id", connection);
                 command.Parameters.AddWithValue("@Id", id);
 
                 await command.ExecuteNonQueryAsync();
