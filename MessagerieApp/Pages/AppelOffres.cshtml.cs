@@ -1,28 +1,40 @@
-using MessagerieApp.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using MessagerieApp.Services;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MessagerieApp.Pages
 {
-    public class AppelOffresModel : PageModel
+    public class AppelOffreModel : PageModel
     {
-        public List<AppelOffres> AppelOffresList { get; set; } = new List<AppelOffres>();
+        private readonly INotificationService _notificationService;
 
-        public void OnGet()
+        public AppelOffreModel(INotificationService notificationService)
         {
-            // Fetch AppelOffres from the database or service
-            // Example:
-            // AppelOffresList = _appelOffreService.GetAllAppelOffres();
+            _notificationService = notificationService;
         }
 
-        public void OnPost(DateTime startDate, DateTime endDate)
+        [BindProperty]
+        public int ResponsableRessourcesId { get; set; }
+
+        [BindProperty]
+        public int FournisseurSelectionneId { get; set; }
+
+        [BindProperty]
+        public List<int> AutresFournisseursId { get; set; }
+
+        public async Task<IActionResult> OnPostAsync()
         {
-            // Handle creation of a new AppelOffre
-            // Example:
-            // var newAppelOffre = new AppelOffre { StartDate = startDate, EndDate = endDate };
-            // _appelOffreService.AddAppelOffre(newAppelOffre);
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
+            // Send notifications for call for tenders
+            await _notificationService.EnvoyerNotificationsAppelOffre(ResponsableRessourcesId, FournisseurSelectionneId, AutresFournisseursId);
+
+            return RedirectToPage("/Success"); // Redirect to a success page
         }
     }
-
-   
 }

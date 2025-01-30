@@ -1,32 +1,56 @@
 ﻿@page
-@model DepartementModel
+@model MessagerieApp.Pages.DepartementModel
 @{
-    ViewData["Title"] = "Department Management";
+    ViewData["Title"] = "Départements";
 }
 
-<h2>Department Management</h2>
+<h2>Départements</h2>
 
+<!-- Form to create a new department -->
 <form method="post">
-    <div>
-        <label for="DepartmentName">Department Name:</label>
-        <input type="text" id="DepartmentName" name="DepartmentName" />
+    <div class="form-group">
+        <label for="Nom">Nom</label>
+        <input type="text" class="form-control" asp-for="Departement.Nom" />
     </div>
-    <button type="submit">Add Department</button>
+    <div class="form-group">
+        <label for="Code">Code</label>
+        <input type="text" class="form-control" asp-for="Departement.Code" />
+    </div>
+    <div class="form-group">
+        <label for="ResponsableId">ID du Responsable</label>
+        <input type="number" class="form-control" asp-for="Departement.ResponsableId" />
+    </div>
+    <button type="submit" class="btn btn-primary">Créer un Département</button>
 </form>
 
-<table>
+<!-- List of departments -->
+<h3>Liste des Départements</h3>
+<table class="table">
     <thead>
         <tr>
             <th>ID</th>
-            <th>Department Name</th>
+            <th>Nom</th>
+            <th>Code</th>
+            <th>ID du Responsable</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var departement in Model.DepartementsList)
+        @foreach (var departement in Model.Departements)
         {
             <tr>
                 <td>@departement.Id</td>
-                <td>@departement.DepartmentName</td>
+                <td>@departement.Nom</td>
+                <td>@departement.Code</td>
+                <td>@departement.ResponsableId</td>
+                <td>
+                    <form method="post" asp-page-handler="Update" asp-route-id="@departement.Id">
+                        <button type="submit" class="btn btn-warning">Modifier</button>
+                    </form>
+                    <form method="post" asp-page-handler="Delete" asp-route-id="@departement.Id">
+                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                    </form>
+                </td>
             </tr>
         }
     </tbody>

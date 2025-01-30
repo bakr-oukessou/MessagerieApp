@@ -1,50 +1,79 @@
 ﻿@page
-@model SupplierModel
+@model MessagerieApp.Pages.SupplierModel
 @{
-    ViewData["Title"] = "Supplier Management";
+    ViewData["Title"] = "Fournisseurs";
 }
 
-<h2>Supplier Management</h2>
+<h2>Fournisseurs</h2>
 
+<!-- Form to create a new supplier -->
 <form method="post">
-    <div>
-        <label for="CompanyName">Company Name:</label>
-        <input type="text" id="CompanyName" name="CompanyName" />
+    <div class="form-group">
+        <label for="CompanyName">Nom de l'entreprise</label>
+        <input type="text" class="form-control" asp-for="Supplier.CompanyName" />
     </div>
-    <div>
-        <label for="Address">Address:</label>
-        <input type="text" id="Address" name="Address" />
+    <div class="form-group">
+        <label for="Location">Localisation</label>
+        <input type="text" class="form-control" asp-for="Supplier.Location" />
     </div>
-    <div>
-        <label for="Website">Website:</label>
-        <input type="text" id="Website" name="Website" />
+    <div class="form-group">
+        <label for="Address">Adresse</label>
+        <input type="text" class="form-control" asp-for="Supplier.Address" />
     </div>
-    <div>
-        <label for="Manager">Manager:</label>
-        <input type="text" id="Manager" name="Manager" />
+    <div class="form-group">
+        <label for="Website">Site web</label>
+        <input type="text" class="form-control" asp-for="Supplier.Website" />
     </div>
-    <button type="submit">Add Supplier</button>
+    <div class="form-group">
+        <label for="ManagerName">Nom du gérant</label>
+        <input type="text" class="form-control" asp-for="Supplier.ManagerName" />
+    </div>
+    <button type="submit" class="btn btn-primary">Créer un Fournisseur</button>
 </form>
 
-<table>
+<!-- List of suppliers -->
+<h3>Liste des Fournisseurs</h3>
+<table class="table">
     <thead>
         <tr>
             <th>ID</th>
-            <th>Company Name</th>
-            <th>Address</th>
-            <th>Website</th>
-            <th>Manager</th>
+            <th>Nom de l'entreprise</th>
+            <th>Localisation</th>
+            <th>Adresse</th>
+            <th>Site web</th>
+            <th>Nom du gérant</th>
+            <th>Blacklisté</th>
+            <th>Raison de la blacklist</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var supplier in Model.SuppliersList)
+        @foreach (var supplier in Model.Suppliers)
         {
             <tr>
                 <td>@supplier.Id</td>
                 <td>@supplier.CompanyName</td>
+                <td>@supplier.Location</td>
                 <td>@supplier.Address</td>
                 <td>@supplier.Website</td>
-                <td>@supplier.Manager</td>
+                <td>@supplier.ManagerName</td>
+                <td>@(supplier.IsBlacklisted ? "Oui" : "Non")</td>
+                <td>@supplier.BlacklistReason</td>
+                <td>
+                    <form method="post" asp-page-handler="Update" asp-route-id="@supplier.Id">
+                        <button type="submit" class="btn btn-warning">Modifier</button>
+                    </form>
+                    <form method="post" asp-page-handler="Delete" asp-route-id="@supplier.Id">
+                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                    </form>
+                    <form method="post" asp-page-handler="Blacklist" asp-route-id="@supplier.Id">
+                        <input type="text" name="reason" placeholder="Raison de la blacklist" />
+                        <button type="submit" class="btn btn-dark">Blacklister</button>
+                    </form>
+                    <form method="post" asp-page-handler="RemoveFromBlacklist" asp-route-id="@supplier.Id">
+                        <button type="submit" class="btn btn-success">Retirer de la blacklist</button>
+                    </form>
+                </td>
             </tr>
         }
     </tbody>

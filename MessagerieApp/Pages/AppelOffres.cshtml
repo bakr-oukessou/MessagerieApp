@@ -1,39 +1,23 @@
 ﻿@page
-@model AppelOffresModel
+@model MessagerieApp.Pages.AppelOffreModel
 @{
-    ViewData["Title"] = "Appel d'Offres Management";
+    ViewData["Title"] = "Appel d'Offre";
 }
 
-<h2>Appel d'Offres Management</h2>
+<h2>Appel d'Offre</h2>
 
 <form method="post">
-    <div>
-        <label for="StartDate">Start Date:</label>
-        <input type="date" id="StartDate" name="StartDate" />
+    <div class="form-group">
+        <label for="ResponsableRessourcesId">ID du Responsable des Ressources</label>
+        <input type="number" class="form-control" asp-for="ResponsableRessourcesId" />
     </div>
-    <div>
-        <label for="EndDate">End Date:</label>
-        <input type="date" id="EndDate" name="EndDate" />
+    <div class="form-group">
+        <label for="FournisseurSelectionneId">ID du Fournisseur Sélectionné</label>
+        <input type="number" class="form-control" asp-for="FournisseurSelectionneId" />
     </div>
-    <button type="submit">Create Appel d'Offres</button>
+    <div class="form-group">
+        <label for="AutresFournisseursId">IDs des Autres Fournisseurs (séparés par des virgules)</label>
+        <input type="text" class="form-control" asp-for="AutresFournisseursId" />
+    </div>
+    <button type="submit" class="btn btn-primary">Envoyer les Notifications</button>
 </form>
-
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Start Date</th>
-            <th>End Date</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var appelOffre in Model.AppelOffresList)
-        {
-            <tr>
-                <td>@appelOffre.Id</td>
-                <td>@appelOffre.StartDate</td>
-                <td>@appelOffre.EndDate</td>
-            </tr>
-        }
-    </tbody>
-</table>

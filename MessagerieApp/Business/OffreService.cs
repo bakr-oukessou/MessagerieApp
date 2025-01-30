@@ -1,6 +1,7 @@
 ﻿using MessagerieApp.Business.Interfaces;
 using MessagerieApp.Models;
 using MessagerieApp.Repository.Interfaces;
+using MessagerieApp.Services;
 
 namespace MessagerieApp.Business
 {
@@ -70,7 +71,7 @@ namespace MessagerieApp.Business
                     : "Rejected";
 
                 // Notify suppliers about their bid status
-                await _notificationService.CreateNotificationAsync(new Notification
+                await _notificationService.AddNotificationAsync(new Notification
                 {
                     // Assuming Notification class has these properties
                     // Adjust the property names according to your Notification class definition

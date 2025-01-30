@@ -1,47 +1,54 @@
 ﻿@page
-@model DemandeRessourceItemModel
+@model MessagerieApp.Pages.DemandeRessourceItemModel
 @{
-    ViewData["Title"] = "Resource Request Item Management";
+    ViewData["Title"] = "Détails de la Demande";
 }
 
-<h2>Resource Request Item Management</h2>
+<h2>Détails de la Demande</h2>
 
+<!-- Display the resource request details -->
+<div>
+    <h4>Demande #@Model.Demande.Id</h4>
+    <p>Département: @Model.Demande.DepartmentId</p>
+    <p>Date de Demande: @Model.Demande.RequestDate.ToShortDateString()</p>
+    <p>Statut: @Model.Demande.Status</p>
+</div>
+
+<!-- Form to add a new item to the request -->
 <form method="post">
-    <div>
-        <label for="DemandeRessourceId">Resource Request ID:</label>
-        <input type="text" id="DemandeRessourceId" name="DemandeRessourceId" />
+    <input type="hidden" asp-for="DemandeRessourceId" value="@Model.Demande.Id" />
+    <div class="form-group">
+        <label for="ResourceType">Type de Ressource</label>
+        <input type="text" class="form-control" asp-for="ResourceType" />
     </div>
-    <div>
-        <label for="ResourceType">Resource Type:</label>
-        <select id="ResourceType" name="ResourceType">
-            <option value="Computer">Computer</option>
-            <option value="Printer">Printer</option>
-        </select>
+    <div class="form-group">
+        <label for="Quantity">Quantité</label>
+        <input type="number" class="form-control" asp-for="Quantity" />
     </div>
-    <div>
-        <label for="Quantity">Quantity:</label>
-        <input type="number" id="Quantity" name="Quantity" />
+    <div class="form-group">
+        <label for="Specifications">Spécifications</label>
+        <textarea class="form-control" asp-for="Specifications"></textarea>
     </div>
-    <button type="submit">Add Item</button>
+    <button type="submit" class="btn btn-primary">Ajouter un Élément</button>
 </form>
 
-<table>
+<!-- List of items in the request -->
+<h3>Éléments de la Demande</h3>
+<table class="table">
     <thead>
         <tr>
-            <th>ID</th>
-            <th>Resource Request ID</th>
-            <th>Resource Type</th>
-            <th>Quantity</th>
+            <th>Type de Ressource</th>
+            <th>Quantité</th>
+            <th>Spécifications</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.DemandeRessourceItemList)
+        @foreach (var item in Model.Demande.Items)
         {
             <tr>
-                <td>@item.Id</td>
-                <td>@item.ResourceRequestId</td>
                 <td>@item.Type</td>
                 <td>@item.Quantity</td>
+                <td>@item.Specifications</td>
             </tr>
         }
     </tbody>

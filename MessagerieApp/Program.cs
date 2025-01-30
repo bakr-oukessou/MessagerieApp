@@ -12,17 +12,43 @@ var builder = WebApplication.CreateBuilder(args);
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 
+DatabaseConnection dbHelper = new DatabaseConnection(connectionString);
+
+// Test de la connexion
+dbHelper.TestConnection();
+
+builder.Services.AddRazorPages();
+
 // Register Repository and Service
+
+builder.Services.AddControllersWithViews();   
 builder.Services.AddScoped<IUserRepository>(provider =>
     new UserRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IUserService, UserService>();
-
-// Add services to the container.
-builder.Services.AddRazorPages();
-builder.Services.AddControllersWithViews();     
+builder.Services.AddScoped<IDemandeRessourceRepository>(provider =>
+    new DemandeRessourceRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<IDemandeRessourceService, DemandeRessourceService>();
 builder.Services.AddScoped<IRessourceRepository>(provider =>
     new RessourceRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IRessourceService, RessourceService>();
+builder.Services.AddScoped<IDepartementRepository>(provider =>
+    new DepartementRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<IDepartementService, DepartementService>();
+builder.Services.AddScoped<ISupplierRepository>(provider =>
+    new SupplierRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<IMaintenanceDiagnosisRepository>(provider =>
+    new MaintenanceDiagnosisRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<IMaintenanceDiagnosisService, MaintenanceDiagnosisService>();
+builder.Services.AddScoped<INotificationRepository>(provider =>
+    new NotificationRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IRessourceRepository, RessourceRepository>();
+builder.Services.AddScoped<IRessourceService, RessourceService>();
+builder.Services.AddScoped<IMaintenanceDiagnosisRepository, MaintenanceDiagnosisRepository>();
+builder.Services.AddScoped<IMaintenanceDiagnosisService, MaintenanceDiagnosisService>();
+
 builder.Services.AddScoped<DatabaseConnection>();
 builder.Services.AddScoped<RessourceRepository>();
 // Add services to the container.
@@ -37,11 +63,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-// Création d'un helper pour exécuter des commandes SQL
-DatabaseConnection dbHelper = new DatabaseConnection(connectionString);
 
-// Test de la connexion
-dbHelper.TestConnection();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

@@ -1,26 +1,63 @@
-using MessagerieApp.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using MessagerieApp.Models;
+using MessagerieApp.Services;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MessagerieApp.Pages
 {
     public class DemandeRessourceItemModel : PageModel
     {
-        public List<DemandeRessourceItem> DemandeRessourceItemList { get; set; } = new List<DemandeRessourceItem>();
+        private readonly IDemandeRessourceService _demandeRessourceService;
 
-        public void OnGet()
+        public DemandeRessourceItemModel(IDemandeRessourceService demandeRessourceService)
         {
-            // Fetch DemandeRessource items from the database or service
-            // Example:
-            // DemandeRessourceItemList = _demandeRessourceItemService.GetAllDemandeRessourceItems();
+            _demandeRessourceService = demandeRessourceService;
         }
 
-        public void OnPost(int demandeRessourceId, string resourceType, int quantity)
+        // The resource request being edited
+        public DemandeRessource Demande { get; set; }
+
+        // Properties for adding a new item to the request
+        [BindProperty]
+        public int DemandeRessourceId { get; set; }
+
+        [BindProperty]
+        public string ResourceType { get; set; }
+
+        [BindProperty]
+        public int Quantity { get; set; }
+
+        [BindProperty]
+        public string Specifications { get; set; }
+
+        // Load the resource request and its items on page load
+        public async Task OnGetAsync(int id)
         {
-            // Handle creation of a new DemandeRessource item
-            // Example:
-            // var newItem = new DemandeRessourceItem { DemandeRessourceId = demandeRessourceId, ResourceType = resourceType, Quantity = quantity };
-            // _demandeRessourceItemService.AddDemandeRessourceItem(newItem);
+            Demande = await _demandeRessourceService.GetDemandeByIdAsync(id);
+        }
+
+        // Handle form submission to add a new item to the request
+        public async Task<IActionResult> OnPostAsync()
+        {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
+            var item = new DemandeRessourceItem
+            {
+                ResourceRequestId = DemandeRessourceId,
+                Type = ResourceType,
+                Quantity = Quantity,
+                Specifications = Specifications
+            };
+
+            // Add the item to the request (you need to implement this method in the service)
+            await _demandeRessourceService.AddItemToDemandeAsync(DemandeRessourceId, item);
+
+            return RedirectToPage("/DemandeRessourceItem", new { id = DemandeRessourceId }); // Refresh the page
         }
     }
 }

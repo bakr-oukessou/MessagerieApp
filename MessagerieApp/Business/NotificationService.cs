@@ -1,38 +1,26 @@
-﻿using MessagerieApp.Business.Interfaces;
+﻿using MessagerieApp.Repositories;
 using MessagerieApp.Models;
-using MessagerieApp.Repositories;
-using MessagerieApp.Repository;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using MessagerieApp.Repository.Interfaces;
 
-namespace MessagerieApp.Business
+namespace MessagerieApp.Services
 {
     public class NotificationService : INotificationService
     {
-        private readonly NotificationRepository _notificationRepository;
-        private readonly UserRepository _utilisateurRepository;
+        private readonly INotificationRepository _notificationRepository;
+        private readonly IUserRepository _utilisateurRepository;
 
-        public NotificationService(
-            NotificationRepository notificationRepository,
-            UserRepository utilisateurRepository)
+        public NotificationService(INotificationRepository notificationRepository, IUserRepository utilisateurRepository)
         {
             _notificationRepository = notificationRepository;
             _utilisateurRepository = utilisateurRepository;
         }
 
-        public Task AddNotificationAsync(Notification notification)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task CreateNotificationAsync(Notification notification)
-        {
-            throw new NotImplementedException();
-        }
-
-        // Envoi de notification aux enseignants pour les besoins
-        public void EnvoyerDemandeBesoinsAuxEnseignants(int chefDepartementId, int departementId)
+        public async Task EnvoyerDemandeBesoinsAuxEnseignants(int chefDepartementId, int departementId)
         {
             // Récupérer tous les enseignants du département
-            var enseignants = _utilisateurRepository.GetUserByIdAsync(departementId);
+            var enseignants = await _utilisateurRepository.GetUsersByDepartmentAsync(departementId);
 
             foreach (var enseignant in enseignants)
             {
@@ -47,12 +35,11 @@ namespace MessagerieApp.Business
                     DateCreation = DateTime.Now
                 };
 
-                _notificationRepository.AddNotificationAsync(notification);
+                await _notificationRepository.AddNotificationAsync(notification);
             }
         }
 
-        // Envoi de notifications pour les appels d'offres
-        public void EnvoyerNotificationsAppelOffre(int responsableRessourcesId, int fournisseurSelectionneId, List<int> autresFournisseursId)
+        public async Task EnvoyerNotificationsAppelOffre(int responsableRessourcesId, int fournisseurSelectionneId, List<int> autresFournisseursId)
         {
             // Notification au fournisseur sélectionné
             var notificationAcceptation = new Notification
@@ -65,7 +52,7 @@ namespace MessagerieApp.Business
                 Statut = StatutNotification.NonLue,
                 DateCreation = DateTime.Now
             };
-            _notificationRepository.AddNotificationAsync(notificationAcceptation);
+            await _notificationRepository.AddNotificationAsync(notificationAcceptation);
 
             // Notifications de rejet aux autres fournisseurs
             foreach (var fournisseurId in autresFournisseursId)
@@ -80,22 +67,58 @@ namespace MessagerieApp.Business
                     Statut = StatutNotification.NonLue,
                     DateCreation = DateTime.Now
                 };
+                await _notificationRepository.AddNotificationAsync(notificationRejet);
             }
         }
 
-        public Task<List<Notification>> GetAllNotificationsAsync()
+        public async Task<IEnumerable<Notification>> GetAllNotificationsAsync()
         {
-            throw new NotImplementedException();
+            return await _notificationRepository.GetAllNotificationsAsync();
         }
 
-        public Task<Notification> GetNotificationByIdAsync(int id)
+        public async Task<Notification> GetNotificationByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _notificationRepository.GetNotificationByIdAsync(id);
         }
 
-        public Task MarkAsReadAsync(int id)
+        public async Task AddNotificationAsync(Notification notification)
         {
-            throw new NotImplementedException();
+            await _notificationRepository.AddNotificationAsync(notification);
+        }
+
+        public async Task UpdateNotificationAsync(Notification notification)
+        {
+            await _notificationRepository.UpdateNotificationAsync(notification);
+        }
+
+        public async Task DeleteNotificationAsync(int id)
+        {
+            await _notificationRepository.DeleteNotificationAsync(id);
+        }
+
+        public async Task MarkNotificationAsReadAsync(int notificationId)
+        {
+            await _notificationRepository.MarkNotificationAsReadAsync(notificationId);
+        }
+
+        public async Task MarkNotificationAsArchivedAsync(int notificationId)
+        {
+            await _notificationRepository.MarkNotificationAsArchivedAsync(notificationId);
+        }
+
+        public async Task<IEnumerable<Notification>> GetNotificationsByUserAsync(int userId)
+        {
+            return await _notificationRepository.GetNotificationsByUserAsync(userId);
+        }
+
+        public async Task<IEnumerable<Notification>> GetNotificationsByTypeAsync(NotificationType type)
+        {
+            return await _notificationRepository.GetNotificationsByTypeAsync(type);
+        }
+
+        public async Task<IEnumerable<Notification>> GetNotificationsByStatusAsync(StatutNotification status)
+        {
+            return await _notificationRepository.GetNotificationsByStatusAsync(status);
         }
     }
 }

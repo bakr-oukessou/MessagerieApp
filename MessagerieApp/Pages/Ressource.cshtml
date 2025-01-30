@@ -1,47 +1,77 @@
 ﻿@page
-@model RessourceModel
+@model MessagerieApp.Pages.RessourceModel
 @{
-    ViewData["Title"] = "Resource Management";
+    ViewData["Title"] = "Ressources";
 }
 
-<h2>Resource Management</h2>
+<h2>Ressources</h2>
 
+<!-- Form to create a new resource -->
 <form method="post">
-    <div>
-        <label for="ResourceType">Resource Type:</label>
-        <select id="ResourceType" name="ResourceType">
-            <option value="Computer">Computer</option>
-            <option value="Printer">Printer</option>
-        </select>
+    <div class="form-group">
+        <label for="InventoryNumber">Numéro d'Inventaire</label>
+        <input type="text" class="form-control" asp-for="InventoryNumber" />
     </div>
-    <div>
-        <label for="ResourceId">Resource ID:</label>
-        <input type="text" id="ResourceId" name="ResourceId" />
+    <div class="form-group">
+        <label for="Type">Type</label>
+        <input type="text" class="form-control" asp-for="Type" />
     </div>
-    <div>
-        <label for="DepartmentId">Department ID:</label>
-        <input type="text" id="DepartmentId" name="DepartmentId" />
+    <div class="form-group">
+        <label for="Brand">Marque</label>
+        <input type="text" class="form-control" asp-for="Brand" />
     </div>
-    <button type="submit">Add Resource</button>
+    <div class="form-group">
+        <label for="DepartmentId">ID du Département</label>
+        <input type="number" class="form-control" asp-for="DepartmentId" />
+    </div>
+    <div class="form-group">
+        <label for="AssignedToUserId">ID de l'Utilisateur Assigné</label>
+        <input type="number" class="form-control" asp-for="AssignedToUserId" />
+    </div>
+    <div class="form-group">
+        <label for="AcquisitionDate">Date d'Acquisition</label>
+        <input type="date" class="form-control" asp-for="AcquisitionDate" />
+    </div>
+    <div class="form-group">
+        <label for="WarrantyEndDate">Date de Fin de Garantie</label>
+        <input type="date" class="form-control" asp-for="WarrantyEndDate" />
+    </div>
+    <div class="form-group">
+        <label for="Status">Statut</label>
+        <input type="text" class="form-control" asp-for="Status" />
+    </div>
+    <button type="submit" class="btn btn-primary">Créer une Ressource</button>
 </form>
 
-<table>
+<!-- List of resources -->
+<h3>Liste des Ressources</h3>
+<table class="table">
     <thead>
         <tr>
             <th>ID</th>
-            <th>Resource Type</th>
-            <th>Resource ID</th>
-            <th>Department ID</th>
+            <th>Numéro d'Inventaire</th>
+            <th>Type</th>
+            <th>Marque</th>
+            <th>ID du Département</th>
+            <th>ID de l'Utilisateur Assigné</th>
+            <th>Date d'Acquisition</th>
+            <th>Date de Fin de Garantie</th>
+            <th>Statut</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var ressource in Model.RessourcesList)
+        @foreach (var ressource in Model.Ressources)
         {
             <tr>
                 <td>@ressource.Id</td>
-                <td>@ressource.ResourceType</td>
-                <td>@ressource.ResourceId</td>
+                <td>@ressource.InventoryNumber</td>
+                <td>@ressource.Type</td>
+                <td>@ressource.Brand</td>
                 <td>@ressource.DepartmentId</td>
+                <td>@ressource.AssignedToUserId</td>
+                <td>@ressource.AcquisitionDate.ToShortDateString()</td>
+                <td>@(ressource.WarrantyEndDate?.ToShortDateString() ?? "N/A")</td>
+                <td>@ressource.Status</td>
             </tr>
         }
     </tbody>

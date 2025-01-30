@@ -48,5 +48,10 @@ namespace MessagerieApp.Services
         {
             return await _demandeRessourceRepository.GetDemandesByDepartmentAsync(departmentId);
         }
+
+        public Task AddItemToDemandeAsync(int demandeRessourceId, DemandeRessourceItem item)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

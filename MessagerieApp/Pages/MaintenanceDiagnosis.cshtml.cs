@@ -1,26 +1,66 @@
-using MessagerieApp.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using MessagerieApp.Models;
+using MessagerieApp.Services;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MessagerieApp.Pages
 {
     public class MaintenanceDiagnosisModel : PageModel
     {
-        public List<MaintenanceDiagnosis> MaintenanceDiagnosisList { get; set; } = new List<MaintenanceDiagnosis>();
+        private readonly IMaintenanceDiagnosisService _maintenanceDiagnosisService;
 
-        public void OnGet()
+        public MaintenanceDiagnosisModel(IMaintenanceDiagnosisService maintenanceDiagnosisService)
         {
-            // Fetch maintenance diagnoses from the database or service
-            // Example:
-            // MaintenanceDiagnosisList = _maintenanceDiagnosisService.GetAllMaintenanceDiagnoses();
+            _maintenanceDiagnosisService = maintenanceDiagnosisService;
         }
 
-        public void OnPost(int resourceId, string diagnosis, int technicianId)
+        // List of maintenance diagnoses to display
+        public IEnumerable<MaintenanceDiagnosis> MaintenanceDiagnoses { get; set; }
+
+        // Properties for creating/editing a maintenance diagnosis
+        [BindProperty]
+        public MaintenanceDiagnosis MaintenanceDiagnosis { get; set; }
+
+        // Load maintenance diagnoses on page load
+        public async Task OnGetAsync()
         {
-            // Handle creation of a new maintenance diagnosis
-            // Example:
-            // var newDiagnosis = new MaintenanceDiagnosis { ResourceId = resourceId, Diagnosis = diagnosis, TechnicianId = technicianId };
-            // _maintenanceDiagnosisService.AddMaintenanceDiagnosis(newDiagnosis);
+            MaintenanceDiagnoses = await _maintenanceDiagnosisService.GetAllMaintenanceDiagnosesAsync();
+        }
+
+        // Handle form submission to create a new maintenance diagnosis
+        public async Task<IActionResult> OnPostAsync()
+        {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
+            await _maintenanceDiagnosisService.AddMaintenanceDiagnosisAsync(MaintenanceDiagnosis);
+
+            return RedirectToPage("/MaintenanceDiagnosis"); // Refresh the page
+        }
+
+        // Handle form submission to update a maintenance diagnosis
+        public async Task<IActionResult> OnPostUpdateAsync(string id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
+            await _maintenanceDiagnosisService.UpdateMaintenanceDiagnosisAsync(MaintenanceDiagnosis);
+
+            return RedirectToPage("/MaintenanceDiagnosis"); // Refresh the page
+        }
+
+        // Handle form submission to delete a maintenance diagnosis
+        public async Task<IActionResult> OnPostDeleteAsync(string id)
+        {
+            await _maintenanceDiagnosisService.DeleteMaintenanceDiagnosisAsync(id);
+
+            return RedirectToPage("/MaintenanceDiagnosis"); // Refresh the page
         }
     }
 }

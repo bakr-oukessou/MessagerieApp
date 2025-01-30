@@ -1,27 +1,65 @@
-using MessagerieApp.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using MessagerieApp.Models;
+using MessagerieApp.Services;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MessagerieApp.Pages
 {
     public class DemandeRessourceModel : PageModel
     {
-        public List<DemandeRessource> DemandeRessourceList { get; set; } = new List<DemandeRessource>();
+        private readonly IDemandeRessourceService _demandeRessourceService;
 
-        public void OnGet()
+        public DemandeRessourceModel(IDemandeRessourceService demandeRessourceService)
         {
-            // Fetch resource requests from the database or service
-            // Example:
-            // DemandeRessourceList = _demandeRessourceService.GetAllDemandeRessources();
+            _demandeRessourceService = demandeRessourceService;
         }
 
-        public void OnPost(int teacherId, string resourceType, int quantity)
+        // List of resource requests to display
+        public IEnumerable<DemandeRessource> Demandes { get; set; }
+
+        // Properties for creating a new resource request
+        [BindProperty]
+        public int DepartmentId { get; set; }
+
+        [BindProperty]
+        public DateTime RequestDate { get; set; }
+
+        [BindProperty]
+        public string Status { get; set; }
+
+        // Load resource requests on page load
+        public async Task OnGetAsync()
         {
-            // Handle creation of a new resource request
-            // Example:
-            // var newDemande = new DemandeRessource { TeacherId = teacherId, ResourceType = resourceType, Quantity = quantity };
-            // _demandeRessourceService.AddDemandeRessource(newDemande);
+            Demandes = await _demandeRessourceService.GetAllDemandesAsync();
+        }
+
+        // Handle form submission to create a new resource request
+        public async Task<IActionResult> OnPostAsync()
+        {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
+            var demande = new DemandeRessource
+            {
+                DepartmentId = DepartmentId,
+                RequestDate = RequestDate,
+                Status = Status
+            };
+
+            await _demandeRessourceService.AddDemandeAsync(demande);
+
+            return RedirectToPage("/DemandeRessource"); // Refresh the page
+        }
+
+        // Update the status of a resource request
+        public async Task<IActionResult> OnPostUpdateStatusAsync(int id, string status)
+        {
+            await _demandeRessourceService.UpdateDemandeStatusAsync(id, status);
+            return RedirectToPage("/DemandeRessource");
         }
     }
-
 }

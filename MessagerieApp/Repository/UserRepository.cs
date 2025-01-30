@@ -144,5 +144,33 @@ namespace MessagerieApp.Repositories
                 await command.ExecuteNonQueryAsync();
             }
         }
+        public async Task<IEnumerable<User>> GetUsersByDepartmentAsync(int departmentId)
+        {
+            var utilisateurs = new List<User>();
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                var command = new SqlCommand("SELECT * FROM Users WHERE DepartementId = @DepartementId", connection);
+                command.Parameters.AddWithValue("@DepartementId", departmentId);
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        utilisateurs.Add(new User
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            UserName = reader.GetString(reader.GetOrdinal("UserName")),
+                            Email = reader.GetString(reader.GetOrdinal("Email")),
+                            Role = reader.GetString(reader.GetOrdinal("Role")),
+                            DepartementId = reader.GetInt32(reader.GetOrdinal("DepartementId"))
+                        });
+                    }
+                }
+            }
+
+            return utilisateurs;
+        }
     }
 }

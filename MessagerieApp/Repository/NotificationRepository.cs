@@ -1,127 +1,270 @@
-﻿using System;
+﻿using System.Data.SqlClient;
+using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using MessagerieApp.Helpers;
 using MessagerieApp.Models;
-using MessagerieApp.Repository.Interfaces;
-using Microsoft.Extensions.Configuration;
 
 namespace MessagerieApp.Repositories
 {
     public class NotificationRepository : INotificationRepository
     {
-        private readonly DatabaseHelper _databaseHelper;
+        private readonly string _connectionString;
 
         public NotificationRepository(string connectionString)
         {
-            _databaseHelper = new DatabaseHelper(connectionString);
+            _connectionString = connectionString;
         }
 
-        public async Task<List<Notification>> GetAllNotificationsAsync()
+        public async Task<IEnumerable<Notification>> GetAllNotificationsAsync()
         {
             var notifications = new List<Notification>();
 
-            using (SqlConnection conn = await _databaseHelper.CreateAndOpenConnectionAsync())
+            using (var connection = new SqlConnection(_connectionString))
             {
-                conn.Open();
-                string query = "SELECT * FROM Notifications";
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                await connection.OpenAsync();
+                var command = new SqlCommand("SELECT * FROM Notifications", connection);
+                using (var reader = await command.ExecuteReaderAsync())
                 {
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    while (await reader.ReadAsync())
                     {
-                        while (reader.Read())
+                        notifications.Add(new Notification
                         {
-                            notifications.Add(new Notification
-                            {
-                                Id = reader.GetInt32("Id"),
-                                EmetteurId = reader.GetInt32("EmetteurId"),
-                                DestinataireId = reader.GetInt32("DestinataireId"),
-                                Titre = reader.GetString("Titre"),
-                                Corps = reader.GetString("Corps"),
-                                Type = (NotificationType)reader.GetInt32("Type"),
-                                Statut = (StatutNotification)reader.GetInt32("Statut"),
-                                DateCreation = reader.GetDateTime("DateCreation"),
-                                DateLecture = reader.IsDBNull("DateLecture") ? (DateTime?)null : reader.GetDateTime("DateLecture")
-                            });
-                        }
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            EmetteurId = reader.GetInt32(reader.GetOrdinal("EmetteurId")),
+                            DestinataireId = reader.GetInt32(reader.GetOrdinal("DestinataireId")),
+                            Titre = reader.GetString(reader.GetOrdinal("Titre")),
+                            Corps = reader.GetString(reader.GetOrdinal("Corps")),
+                            Type = (NotificationType)reader.GetInt32(reader.GetOrdinal("Type")),
+                            Statut = (StatutNotification)reader.GetInt32(reader.GetOrdinal("Statut")),
+                            DateCreation = reader.GetDateTime(reader.GetOrdinal("DateCreation")),
+                            DateLecture = reader.IsDBNull(reader.GetOrdinal("DateLecture")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("DateLecture"))
+                        });
                     }
                 }
             }
+
             return notifications;
         }
 
         public async Task<Notification> GetNotificationByIdAsync(int id)
         {
-            Notification notification = null;
-
-            using (SqlConnection conn = await _databaseHelper.CreateAndOpenConnectionAsync())
+            using (var connection = new SqlConnection(_connectionString))
             {
-                conn.Open();
-                string query = "SELECT * FROM Notifications WHERE Id = @Id";
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                await connection.OpenAsync();
+                var command = new SqlCommand("SELECT * FROM Notifications WHERE Id = @Id", connection);
+                command.Parameters.AddWithValue("@Id", id);
+
+                using (var reader = await command.ExecuteReaderAsync())
                 {
-                    cmd.Parameters.AddWithValue("@Id", id);
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    if (await reader.ReadAsync())
                     {
-                        if (reader.Read())
+                        return new Notification
                         {
-                            notification = new Notification
-                            {
-                                Id = reader.GetInt32("Id"),
-                                EmetteurId = reader.GetInt32("EmetteurId"),
-                                DestinataireId = reader.GetInt32("DestinataireId"),
-                                Titre = reader.GetString("Titre"),
-                                Corps = reader.GetString("Corps"),
-                                Type = (NotificationType)reader.GetInt32("Type"),
-                                Statut = (StatutNotification)reader.GetInt32("Statut"),
-                                DateCreation = reader.GetDateTime("DateCreation"),
-                                DateLecture = reader.IsDBNull("DateLecture") ? (DateTime?)null : reader.GetDateTime("DateLecture")
-                            };
-                        }
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            EmetteurId = reader.GetInt32(reader.GetOrdinal("EmetteurId")),
+                            DestinataireId = reader.GetInt32(reader.GetOrdinal("DestinataireId")),
+                            Titre = reader.GetString(reader.GetOrdinal("Titre")),
+                            Corps = reader.GetString(reader.GetOrdinal("Corps")),
+                            Type = (NotificationType)reader.GetInt32(reader.GetOrdinal("Type")),
+                            Statut = (StatutNotification)reader.GetInt32(reader.GetOrdinal("Statut")),
+                            DateCreation = reader.GetDateTime(reader.GetOrdinal("DateCreation")),
+                            DateLecture = reader.IsDBNull(reader.GetOrdinal("DateLecture")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("DateLecture"))
+                        };
                     }
                 }
             }
-            return notification;
+
+            return null;
         }
 
         public async Task AddNotificationAsync(Notification notification)
         {
-            using (SqlConnection conn = await _databaseHelper.CreateAndOpenConnectionAsync())
+            using (var connection = new SqlConnection(_connectionString))
             {
-                conn.Open();
-                string query = "INSERT INTO Notifications (EmetteurId, DestinataireId, Titre, Corps, Type, Statut, DateCreation) " +
-                               "VALUES (@EmetteurId, @DestinataireId, @Titre, @Corps, @Type, @Statut, @DateCreation)";
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@EmetteurId", notification.EmetteurId);
-                    cmd.Parameters.AddWithValue("@DestinataireId", notification.DestinataireId);
-                    cmd.Parameters.AddWithValue("@Titre", notification.Titre);
-                    cmd.Parameters.AddWithValue("@Corps", notification.Corps);
-                    cmd.Parameters.AddWithValue("@Type", (int)notification.Type);
-                    cmd.Parameters.AddWithValue("@Statut", (int)notification.Statut);
-                    cmd.Parameters.AddWithValue("@DateCreation", notification.DateCreation);
+                await connection.OpenAsync();
+                var command = new SqlCommand(
+                    "INSERT INTO Notifications (EmetteurId, DestinataireId, Titre, Corps, Type, Statut, DateCreation) " +
+                    "VALUES (@EmetteurId, @DestinataireId, @Titre, @Corps, @Type, @Statut, @DateCreation); SELECT SCOPE_IDENTITY();",
+                    connection);
 
-                    cmd.ExecuteNonQuery();
-                }
+                command.Parameters.AddWithValue("@EmetteurId", notification.EmetteurId);
+                command.Parameters.AddWithValue("@DestinataireId", notification.DestinataireId);
+                command.Parameters.AddWithValue("@Titre", notification.Titre);
+                command.Parameters.AddWithValue("@Corps", notification.Corps);
+                command.Parameters.AddWithValue("@Type", (int)notification.Type);
+                command.Parameters.AddWithValue("@Statut", (int)notification.Statut);
+                command.Parameters.AddWithValue("@DateCreation", notification.DateCreation);
+
+                notification.Id = Convert.ToInt32(await command.ExecuteScalarAsync());
             }
         }
 
-        public async Task MarkAsReadAsync(int id)
+        public async Task UpdateNotificationAsync(Notification notification)
         {
-            using (SqlConnection conn = await _databaseHelper.CreateAndOpenConnectionAsync())
+            using (var connection = new SqlConnection(_connectionString))
             {
-                conn.Open();
-                string query = "UPDATE Notifications SET Statut = @Statut, DateLecture = @DateLecture WHERE Id = @Id";
-                using (SqlCommand cmd = new SqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@Id", id);
-                    cmd.Parameters.AddWithValue("@Statut", (int)StatutNotification.Lue);
-                    cmd.Parameters.AddWithValue("@DateLecture", DateTime.Now);
+                await connection.OpenAsync();
+                var command = new SqlCommand(
+                    "UPDATE Notifications SET EmetteurId = @EmetteurId, DestinataireId = @DestinataireId, Titre = @Titre, " +
+                    "Corps = @Corps, Type = @Type, Statut = @Statut, DateCreation = @DateCreation, DateLecture = @DateLecture " +
+                    "WHERE Id = @Id",
+                    connection);
 
-                    cmd.ExecuteNonQuery();
+                command.Parameters.AddWithValue("@Id", notification.Id);
+                command.Parameters.AddWithValue("@EmetteurId", notification.EmetteurId);
+                command.Parameters.AddWithValue("@DestinataireId", notification.DestinataireId);
+                command.Parameters.AddWithValue("@Titre", notification.Titre);
+                command.Parameters.AddWithValue("@Corps", notification.Corps);
+                command.Parameters.AddWithValue("@Type", (int)notification.Type);
+                command.Parameters.AddWithValue("@Statut", (int)notification.Statut);
+                command.Parameters.AddWithValue("@DateCreation", notification.DateCreation);
+                command.Parameters.AddWithValue("@DateLecture", notification.DateLecture ?? (object)DBNull.Value);
+
+                await command.ExecuteNonQueryAsync();
+            }
+        }
+
+        public async Task DeleteNotificationAsync(int id)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                var command = new SqlCommand("DELETE FROM Notifications WHERE Id = @Id", connection);
+                command.Parameters.AddWithValue("@Id", id);
+
+                await command.ExecuteNonQueryAsync();
+            }
+        }
+
+        public async Task MarkNotificationAsReadAsync(int notificationId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                var command = new SqlCommand(
+                    "UPDATE Notifications SET Statut = @Statut, DateLecture = @DateLecture WHERE Id = @Id",
+                    connection);
+
+                command.Parameters.AddWithValue("@Id", notificationId);
+                command.Parameters.AddWithValue("@Statut", (int)StatutNotification.Lue);
+                command.Parameters.AddWithValue("@DateLecture", DateTime.Now);
+
+                await command.ExecuteNonQueryAsync();
+            }
+        }
+
+        public async Task MarkNotificationAsArchivedAsync(int notificationId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                var command = new SqlCommand(
+                    "UPDATE Notifications SET Statut = @Statut WHERE Id = @Id",
+                    connection);
+
+                command.Parameters.AddWithValue("@Id", notificationId);
+                command.Parameters.AddWithValue("@Statut", (int)StatutNotification.Archivee);
+
+                await command.ExecuteNonQueryAsync();
+            }
+        }
+
+        public async Task<IEnumerable<Notification>> GetNotificationsByUserAsync(int userId)
+        {
+            var notifications = new List<Notification>();
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                var command = new SqlCommand("SELECT * FROM Notifications WHERE DestinataireId = @DestinataireId", connection);
+                command.Parameters.AddWithValue("@DestinataireId", userId);
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        notifications.Add(new Notification
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            EmetteurId = reader.GetInt32(reader.GetOrdinal("EmetteurId")),
+                            DestinataireId = reader.GetInt32(reader.GetOrdinal("DestinataireId")),
+                            Titre = reader.GetString(reader.GetOrdinal("Titre")),
+                            Corps = reader.GetString(reader.GetOrdinal("Corps")),
+                            Type = (NotificationType)reader.GetInt32(reader.GetOrdinal("Type")),
+                            Statut = (StatutNotification)reader.GetInt32(reader.GetOrdinal("Statut")),
+                            DateCreation = reader.GetDateTime(reader.GetOrdinal("DateCreation")),
+                            DateLecture = reader.IsDBNull(reader.GetOrdinal("DateLecture")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("DateLecture"))
+                        });
+                    }
                 }
             }
+
+            return notifications;
+        }
+
+        public async Task<IEnumerable<Notification>> GetNotificationsByTypeAsync(NotificationType type)
+        {
+            var notifications = new List<Notification>();
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                var command = new SqlCommand("SELECT * FROM Notifications WHERE Type = @Type", connection);
+                command.Parameters.AddWithValue("@Type", (int)type);
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        notifications.Add(new Notification
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            EmetteurId = reader.GetInt32(reader.GetOrdinal("EmetteurId")),
+                            DestinataireId = reader.GetInt32(reader.GetOrdinal("DestinataireId")),
+                            Titre = reader.GetString(reader.GetOrdinal("Titre")),
+                            Corps = reader.GetString(reader.GetOrdinal("Corps")),
+                            Type = (NotificationType)reader.GetInt32(reader.GetOrdinal("Type")),
+                            Statut = (StatutNotification)reader.GetInt32(reader.GetOrdinal("Statut")),
+                            DateCreation = reader.GetDateTime(reader.GetOrdinal("DateCreation")),
+                            DateLecture = reader.IsDBNull(reader.GetOrdinal("DateLecture")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("DateLecture"))
+                        });
+                    }
+                }
+            }
+
+            return notifications;
+        }
+
+        public async Task<IEnumerable<Notification>> GetNotificationsByStatusAsync(StatutNotification status)
+        {
+            var notifications = new List<Notification>();
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                var command = new SqlCommand("SELECT * FROM Notifications WHERE Statut = @Statut", connection);
+                command.Parameters.AddWithValue("@Statut", (int)status);
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        notifications.Add(new Notification
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            EmetteurId = reader.GetInt32(reader.GetOrdinal("EmetteurId")),
+                            DestinataireId = reader.GetInt32(reader.GetOrdinal("DestinataireId")),
+                            Titre = reader.GetString(reader.GetOrdinal("Titre")),
+                            Corps = reader.GetString(reader.GetOrdinal("Corps")),
+                            Type = (NotificationType)reader.GetInt32(reader.GetOrdinal("Type")),
+                            Statut = (StatutNotification)reader.GetInt32(reader.GetOrdinal("Statut")),
+                            DateCreation = reader.GetDateTime(reader.GetOrdinal("DateCreation")),
+                            DateLecture = reader.IsDBNull(reader.GetOrdinal("DateLecture")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("DateLecture"))
+                        });
+                    }
+                }
+            }
+
+            return notifications;
         }
     }
 }

@@ -8,16 +8,12 @@
 
 <form method="post">
     <div class="form-group">
-        <label for="Description">Description</label>
-        <input asp-for="Besoin.Description" class="form-control" />
-        <span asp-validation-for="Besoin.Description" class="text-danger"></span>
+        <label for="ChefDepartementId">ID du Chef de Département</label>
+        <input type="number" class="form-control" asp-for="ChefDepartementId" />
     </div>
-
     <div class="form-group">
-        <label for="Quantite">Quantité</label>
-        <input asp-for="Besoin.Quantite" class="form-control" />
-        <span asp-validation-for="Besoin.Quantite" class="text-danger"></span>
+        <label for="DepartementId">ID du Département</label>
+        <input type="number" class="form-control" asp-for="ChefDepartementId" />
     </div>
-
-    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="submit" class="btn btn-primary">Envoyer les Demandes</button>
 </form>
