@@ -4,77 +4,144 @@
     ViewData["Title"] = "Tableau de Bord";
 }
 
+<style>
+    body {
+        background-color: #f4f6f9;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .sidebar {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            transition: all 0.3s ease;
+        }
+
+            .sidebar .nav-link:hover {
+                color: #fff;
+                transform: translateX(10px);
+            }
+
+    .dashboard-card {
+        /* max-height: 150px; */
+        border-radius: 20px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+        .dashboard-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+    .recent-activity{
+        height:auto;
+    }
+
+    .recent-activity .list-group-item {
+        border-left: 4px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+        .recent-activity .list-group-item:hover {
+            border-left-color: #667eea;
+            background-color: rgba(102, 126, 234, 0.05);
+        }
+
+    .icon-circle {
+        background-color: rgba(255,255,255,0.2);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn{
+        background-color: deepskyblue;
+        color: #333;
+        border: none;
+        border-radius: 5px;
+        padding: 5px 10px;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    
+    }
+
+</style>
+
 <div class="container-fluid">
     <div class="row">
-        <!-- Sidebar -->
-        <div class="col-md-3 bg-dark text-white p-4">
-            <h2 class="text-center mb-4">Tableau de Bord</h2>
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="/Ressource">Gestion des Ressources</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="/Notification">Notifications</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="/MaintenanceDiagnosis">Diagnostics de Maintenance</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="/Supplier">Fournisseurs</a>
-                </li>
-            </ul>
-        </div>
-
         <!-- Main Content -->
         <div class="col-md-9 p-4">
-            <h1 class="text-center mb-4">Tableau de Bord</h1>
+            <h1 class="mb-4 text-dark">Tableau de Bord</h1>
 
             <!-- Key Metrics Cards -->
             <div class="row">
                 <!-- Total Resources Card -->
                 <div class="col-md-4 mb-4">
-                    <div class="card bg-primary text-white">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-desktop"></i> Ressources</h5>
-                            <p class="card-text">Total des Ressources: @Model.TotalResources</p>
-                            <a href="/Ressource" class="btn btn-light">Voir les Ressources</a>
+                    <div class="card dashboard-card bg-primary text-white">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="icon-circle mr-3">
+                                <i class="fas fa-desktop"></i>
+                            </div>
+                            <div>
+                                <h5 class="card-title mb-2">Ressources</h5>
+                                <p class="card-text">Total: @Model.TotalResources</p>
+                                <a href="/Ressource" class="btn btn-light">View</a>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Total Notifications Card -->
                 <div class="col-md-4 mb-4">
-                    <div class="card bg-success text-white">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-bell"></i> Notifications</h5>
-                            <p class="card-text">Total des Notifications: @Model.TotalNotifications</p>
-                            <a href="/Notification" class="btn btn-light">Voir les Notifications</a>
+                    <div class="card dashboard-card bg-success text-white">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="icon-circle mr-3">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div>
+                                <h5 class="card-title mb-2">Notifications</h5>
+                                <p class="card-text">Total: @Model.TotalNotifications</p>
+                                <a href="/Notification" class="btn btn-light">View</a>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Maintenance Diagnoses Card -->
                 <div class="col-md-4 mb-4">
-                    <div class="card bg-warning text-white">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-tools"></i> Maintenance</h5>
-                            <p class="card-text">Total des Diagnostics: @Model.TotalMaintenanceDiagnoses</p>
-                            <p class="card-text">Diagnostics en Attente: @Model.PendingMaintenanceDiagnoses</p>
-                            <a href="/MaintenanceDiagnosis" class="btn btn-light">Voir les Diagnostics</a>
+                    <div class="card dashboard-card bg-warning text-white">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="icon-circle mr-3">
+                                <i class="fas fa-tools"></i>
+                            </div>
+                            <div>
+                                <h5 class="card-title mb-2">Maintenance</h5>
+                                <p class="card-text">Total: @Model.TotalMaintenanceDiagnoses</p>
+                                <p class="card-text">En Attente: @Model.PendingMaintenanceDiagnoses</p>
+                                <a href="/MaintenanceDiagnosis" class="btn btn-light">View</a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Recent Activity Section -->
-            <div class="row">
+            <div class="row recent-activity">
                 <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header bg-info text-white">
-                            <h5 class="card-title"><i class="fas fa-history"></i> Activité Récente</h5>
+                    <div class="card dashboard-card">
+                        <div class="card-header bg-light">
+                            <h5 class="card-title text-dark"><i class="fas fa-history mr-2"></i>Activité Récente</h5>
                         </div>
                         <div class="card-body">
-                            <ul class="list-group">
+                            <ul class="list-group list-group-flush">
                                 <li class="list-group-item">Nouvelle ressource ajoutée - Ordinateur XYZ</li>
                                 <li class="list-group-item">Notification envoyée - Demande de besoins</li>
                                 <li class="list-group-item">Diagnostic de maintenance créé - Problème matériel</li>
@@ -98,3 +165,28 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- Add your custom JavaScript for SPA functionality -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const sidebarLinks = document.querySelectorAll('.sidebar .nav-link');
+        const mainContent = document.getElementById('main-content');
+
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', function (event) {
+                event.preventDefault();
+                const page = this.getAttribute('data-page');
+                loadPage(page);
+            });
+        });
+
+        function loadPage(page) {
+            fetch(`/${page}`)
+                .then(response => response.text())
+                .then(html => {
+                    mainContent.innerHTML = html;
+                })
+                .catch(error => console.error('Error loading page:', error));
+        }
+    });
+</script>

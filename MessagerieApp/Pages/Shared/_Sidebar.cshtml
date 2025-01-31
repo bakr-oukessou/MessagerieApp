@@ -1,0 +1,67 @@
+﻿<style>
+    /* Sidebar Styles */
+    .sidebar {
+        width: 250px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sidebar-logo {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .sidebar-nav {
+        flex-grow: 1;
+    }
+
+        .sidebar-nav ul {
+            list-style: none;
+            padding: 0;
+        }
+
+            .sidebar-nav ul li {
+                margin-bottom: 10px;
+            }
+
+                .sidebar-nav ul li a {
+                    color: rgba(255,255,255,0.8);
+                    text-decoration: none;
+                    display: flex;
+                    align-items: center;
+                    padding: 10px;
+                    border-radius: 5px;
+                    transition: all 0.3s ease;
+                }
+
+                    .sidebar-nav ul li a:hover,
+                    .sidebar-nav ul li a.active {
+                        background-color: rgba(255,255,255,0.2);
+                        color: white;
+                    }
+
+                    .sidebar-nav ul li a i {
+                        margin-right: 10px;
+                    }
+
+</style>
+<div class="col-md-3 bg-dark text-white p-4 sidebar">
+    <h2 class="text-center mb-4">Tableau de Bord</h2>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link text-white" href="#" data-page="Ressource">Gestion des Ressources</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-white" href="#" data-page="Notification">Notifications</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-white" href="#" data-page="MaintenanceDiagnosis">Diagnostics de Maintenance</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-white" href="#" data-page="Supplier">Fournisseurs</a>
+        </li>
+    </ul>
+</div>

@@ -2,77 +2,173 @@
 @model MessagerieApp.Pages.RessourceModel
 @{
     ViewData["Title"] = "Ressources";
+
 }
 
-<h2>Ressources</h2>
+<style>
+    body {
+        background-color: #f4f6f9;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+    }
 
-<!-- Form to create a new resource -->
-<form method="post">
-    <div class="form-group">
-        <label for="InventoryNumber">Numéro d'Inventaire</label>
-        <input type="text" class="form-control" asp-for="InventoryNumber" />
-    </div>
-    <div class="form-group">
-        <label for="Type">Type</label>
-        <input type="text" class="form-control" asp-for="Type" />
-    </div>
-    <div class="form-group">
-        <label for="Brand">Marque</label>
-        <input type="text" class="form-control" asp-for="Brand" />
-    </div>
-    <div class="form-group">
-        <label for="DepartmentId">ID du Département</label>
-        <input type="number" class="form-control" asp-for="DepartmentId" />
-    </div>
-    <div class="form-group">
-        <label for="AssignedToUserId">ID de l'Utilisateur Assigné</label>
-        <input type="number" class="form-control" asp-for="AssignedToUserId" />
-    </div>
-    <div class="form-group">
-        <label for="AcquisitionDate">Date d'Acquisition</label>
-        <input type="date" class="form-control" asp-for="AcquisitionDate" />
-    </div>
-    <div class="form-group">
-        <label for="WarrantyEndDate">Date de Fin de Garantie</label>
-        <input type="date" class="form-control" asp-for="WarrantyEndDate" />
-    </div>
-    <div class="form-group">
-        <label for="Status">Statut</label>
-        <input type="text" class="form-control" asp-for="Status" />
-    </div>
-    <button type="submit" class="btn btn-primary">Créer une Ressource</button>
-</form>
+    h2, h3 {
+        color: #333;
+        margin-bottom: 20px;
+    }
 
-<!-- List of resources -->
-<h3>Liste des Ressources</h3>
-<table class="table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Numéro d'Inventaire</th>
-            <th>Type</th>
-            <th>Marque</th>
-            <th>ID du Département</th>
-            <th>ID de l'Utilisateur Assigné</th>
-            <th>Date d'Acquisition</th>
-            <th>Date de Fin de Garantie</th>
-            <th>Statut</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var ressource in Model.Ressources)
-        {
+    .container {
+        display:flex;
+        flex-direction: column;
+        max-width: 800px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: border-color 0.3s;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    input[type="date"]:focus {
+        border-color: #667eea;
+        outline: none;
+    }
+
+    .btn-primary {
+        background-color: #667eea;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .btn-primary:hover {
+        background-color: #5a6dbf;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #667eea;
+        color: white;
+    }
+
+    tr:hover {
+        background-color: #f1f1f1;
+    }
+
+</style>
+
+<div class="container">
+    <div class="container2">
+    <h2>Ressources</h2>
+
+    <!-- Form to create a new resource -->
+    <form method="post" class="mb-4">
+        <div class="form-group">
+            <label for="InventoryNumber">Numéro d'Inventaire</label>
+            <input type="text" class="form-control" asp-for="InventoryNumber" required />
+        </div>
+        <div class="form-group">
+            <label for="Type">Type</label>
+            <input type="text" class="form-control" asp-for="Type" required />
+        </div>
+        <div class="form-group">
+            <label for="Brand">Marque</label>
+            <input type="text" class="form-control" asp-for="Brand" required />
+        </div>
+        <div class="form-group">
+            <label for="DepartmentId">ID du Département</label>
+            <input type="number" class="form-control" asp-for="DepartmentId" required />
+        </div>
+        <div class="form-group">
+            <label for="AssignedToUser Id">ID de l'Utilisateur Assigné</label>
+            <input type="number" class="form-control" asp-for="AssignedToUserId" required />
+        </div>
+        <div class="form-group">
+            <label for="AcquisitionDate">Date d'Acquisition</label>
+            <input type="date" class="form-control" asp-for="AcquisitionDate" required />
+        </div>
+        <div class="form-group">
+            <label for="WarrantyEndDate">Date de Fin de Garantie</label>
+            <input type="date" class="form-control" asp-for="WarrantyEndDate" />
+        </div>
+        <div class="form-group">
+            <label for="Status">Statut</label>
+            <input type="text" class="form-control" asp-for="Status" required />
+        </div>
+        <button type="submit" class="btn-primary">Créer une Ressource</button>
+    </form>
+    </div>
+
+    <div class="container2">
+    <!-- List of resources -->
+    <h3>Liste des Ressources</h3>
+    <table>
+        <thead>
             <tr>
-                <td>@ressource.Id</td>
-                <td>@ressource.InventoryNumber</td>
-                <td>@ressource.Type</td>
-                <td>@ressource.Brand</td>
-                <td>@ressource.DepartmentId</td>
-                <td>@ressource.AssignedToUserId</td>
-                <td>@ressource.AcquisitionDate.ToShortDateString()</td>
-                <td>@(ressource.WarrantyEndDate?.ToShortDateString() ?? "N/A")</td>
-                <td>@ressource.Status</td>
+                <th>ID</th>
+                <th>Numéro d'Inventaire</th>
+                <th>Type</th>
+                <th>Marque</th>
+                <th>ID du Département</th>
+                <th>ID de l'Utilisateur Assigné</th>
+                <th>Date d'Acquisition</th>
+                <th>Date de Fin de Garantie</th>
+                <th>Statut</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var ressource in Model.Ressources)
+            {
+                <tr>
+                    <td>@ressource.Id</td>
+                    <td>@ressource.InventoryNumber</td>
+                    <td>@ressource.Type</td>
+                    <td>@ressource.Brand</td>
+                    <td>@ressource.DepartmentId</td>
+                    <td>@ressource.AssignedToUserId</td>
+                    <td>@ressource.AcquisitionDate.ToShortDateString()</td>
+                    <td>@(ressource.WarrantyEndDate?.ToShortDateString() ?? "N/A")</td>
+                    <td>@ressource.Status</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    </div>
+</div>

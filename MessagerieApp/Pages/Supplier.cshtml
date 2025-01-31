@@ -4,77 +4,257 @@
     ViewData["Title"] = "Fournisseurs";
 }
 
-<h2>Fournisseurs</h2>
+<style>
 
-<!-- Form to create a new supplier -->
-<form method="post">
-    <div class="form-group">
-        <label for="CompanyName">Nom de l'entreprise</label>
-        <input type="text" class="form-control" asp-for="Supplier.CompanyName" />
-    </div>
-    <div class="form-group">
-        <label for="Location">Localisation</label>
-        <input type="text" class="form-control" asp-for="Supplier.Location" />
-    </div>
-    <div class="form-group">
-        <label for="Address">Adresse</label>
-        <input type="text" class="form-control" asp-for="Supplier.Address" />
-    </div>
-    <div class="form-group">
-        <label for="Website">Site web</label>
-        <input type="text" class="form-control" asp-for="Supplier.Website" />
-    </div>
-    <div class="form-group">
-        <label for="ManagerName">Nom du gérant</label>
-        <input type="text" class="form-control" asp-for="Supplier.ManagerName" />
-    </div>
-    <button type="submit" class="btn btn-primary">Créer un Fournisseur</button>
-</form>
+    .container {
+        max-width: 1200px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
 
-<!-- List of suppliers -->
-<h3>Liste des Fournisseurs</h3>
-<table class="table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Nom de l'entreprise</th>
-            <th>Localisation</th>
-            <th>Adresse</th>
-            <th>Site web</th>
-            <th>Nom du gérant</th>
-            <th>Blacklisté</th>
-            <th>Raison de la blacklist</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var supplier in Model.Suppliers)
-        {
+    h2, h3 {
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .btn-add-supplier {
+        background-color: #667eea;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-bottom: 20px;
+        transition: background-color 0.3s;
+    }
+
+    .btn-add-supplier:hover {
+        background-color: #5a6dbf;
+    }
+
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 10% auto;
+        padding: 20px;
+        border-radius: 10px;
+        width: 80%;
+        max-width: 500px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .modal-close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .modal-close:hover {
+        color: #667eea;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: border-color 0.3s;
+    }
+
+    input[type="text"]:focus {
+        border-color: #667eea;
+        outline: none;
+    }
+
+    .modal-submit-btn {
+        background-color: #667eea;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .modal-submit-btn:hover {
+        background-color: #5a6dbf;
+    }
+
+    /* Table Styles */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #667eea;
+        color: white;
+    }
+
+    tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .action-buttons form {
+        margin: 0;
+    }
+
+    .btn-warning, .btn-danger, .btn-dark, .btn-success {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 0.8em;
+    }
+
+    .btn-warning { background-color: #ffc107; color: white; }
+    .btn-danger { background-color: #dc3545; color: white; }
+    .btn-dark { background-color: #343a40; color: white; }
+    .btn-success { background-color: #28a745; color: white; }
+
+    
+</style>
+
+<div class="container">
+    <h2>Fournisseurs</h2>
+    
+    <button onclick="openModal()" class="btn-add-supplier">Ajouter un Fournisseur</button>
+
+    <!-- Modal Form -->
+    <div id="supplierModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <h3>Nouveau Fournisseur</h3>
+            <form method="post">
+                <div class="form-group">
+                    <label for="CompanyName">Nom de l'entreprise</label>
+                    <input type="text" asp-for="Supplier.CompanyName" required />
+                </div>
+                <div class="form-group">
+                    <label for="Location">Localisation</label>
+                    <input type="text" asp-for="Supplier.Location" required />
+                </div>
+                <div class="form-group">
+                    <label for="Address">Adresse</label>
+                    <input type="text" asp-for="Supplier.Address" required />
+                </div>
+                <div class="form-group">
+                    <label for="Website">Site web</label>
+                    <input type="text" asp-for="Supplier.Website" />
+                </div>
+                <div class="form-group">
+                    <label for="ManagerName">Nom du gérant</label>
+                    <input type="text" asp-for="Supplier.ManagerName" required />
+                </div>
+                <button type="submit" class="modal-submit-btn">Créer un Fournisseur</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- List of suppliers -->
+    <h3>Liste des Fournisseurs</h3>
+    <table>
+        <thead>
             <tr>
-                <td>@supplier.Id</td>
-                <td>@supplier.CompanyName</td>
-                <td>@supplier.Location</td>
-                <td>@supplier.Address</td>
-                <td>@supplier.Website</td>
-                <td>@supplier.ManagerName</td>
-                <td>@(supplier.IsBlacklisted ? "Oui" : "Non")</td>
-                <td>@supplier.BlacklistReason</td>
-                <td>
-                    <form method="post" asp-page-handler="Update" asp-route-id="@supplier.Id">
-                        <button type="submit" class="btn btn-warning">Modifier</button>
-                    </form>
-                    <form method="post" asp-page-handler="Delete" asp-route-id="@supplier.Id">
-                        <button type="submit" class="btn btn-danger">Supprimer</button>
-                    </form>
-                    <form method="post" asp-page-handler="Blacklist" asp-route-id="@supplier.Id">
-                        <input type="text" name="reason" placeholder="Raison de la blacklist" />
-                        <button type="submit" class="btn btn-dark">Blacklister</button>
-                    </form>
-                    <form method="post" asp-page-handler="RemoveFromBlacklist" asp-route-id="@supplier.Id">
-                        <button type="submit" class="btn btn-success">Retirer de la blacklist</button>
-                    </form>
-                </td>
+                <th>ID</th>
+                <th>Nom de l'entreprise</th>
+                <th>Localisation</th>
+                <th>Adresse</th>
+                <th>Site web</th>
+                <th>Nom du gérant</th>
+                <th>Blacklisté</th>
+                <th>Raison de la blacklist</th>
+                <th>Actions</th>
             </tr>
+        </thead>
+        <tbody>
+            @foreach (var supplier in Model.Suppliers)
+            {
+                <tr>
+                    <td>@supplier.Id</td>
+                    <td>@supplier.CompanyName</td>
+                    <td>@supplier.Location</td>
+                    <td>@supplier.Address</td>
+                    <td>@supplier.Website</td>
+                    <td>@supplier.ManagerName</td>
+                    <td>@(supplier.IsBlacklisted ? "Oui" : "Non")</td>
+                    <td>@supplier.BlacklistReason</td>
+                    <td>
+                        <div class="action-buttons">
+                            <form method="post" asp-page-handler="Update" asp -route-id="@supplier.Id">
+                                <button type="submit" class="btn-warning">Modifier</button>
+                            </form>
+                            <form method="post" asp-page-handler="Delete" asp-route-id="@supplier.Id">
+                                <button type="submit" class="btn-danger">Supprimer</button>
+                            </form>
+                            <form method="post" asp-page-handler="Blacklist" asp-route-id="@supplier.Id">
+                                <input type="text" name="reason" placeholder="Raison de la blacklist" />
+                                <button type="submit" class="btn-dark">Blacklister</button>
+                            </form>
+                            <form method="post" asp-page-handler="RemoveFromBlacklist" asp-route-id="@supplier.Id">
+                                <button type="submit" class="btn-success">Retirer de la blacklist</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function openModal() {
+        document.getElementById("supplierModal").style.display = "block";
+    }
+
+    function closeModal() {
+        document.getElementById("supplierModal").style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        if (event.target == document.getElementById("supplierModal")) {
+            closeModal();
         }
-    </tbody>
-</table>
+    }
+</script>
