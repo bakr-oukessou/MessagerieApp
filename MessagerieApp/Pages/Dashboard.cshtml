@@ -78,7 +78,7 @@
 <div class="container-fluid">
     <div class="row">
         <!-- Main Content -->
-        <div class="col-md-9 p-4">
+        <div class="col-md-9 p-4" style="width:100%">
             <h1 class="mb-4 text-dark">Tableau de Bord</h1>
 
             <!-- Key Metrics Cards -->
@@ -189,4 +189,19 @@
                 .catch(error => console.error('Error loading page:', error));
         }
     });
+</script>
+<script>
+    function openModal() {
+        document.getElementById("supplierModal").style.display = "block";
+    }
+
+    function closeModal() {
+        document.getElementById("supplierModal").style.display = "none";
+    }
+
+    window.onclick = function (event) {
+        if (event.target == document.getElementById("supplierModal")) {
+            closeModal();
+        }
+    }
 </script>

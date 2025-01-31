@@ -48,20 +48,111 @@
                     }
 
 </style>
-<div class="col-md-3 bg-dark text-white p-4 sidebar">
-    <h2 class="text-center mb-4">Tableau de Bord</h2>
-    <ul class="nav flex-column">
-        <li class="nav-item">
-            <a class="nav-link text-white" href="#" data-page="Ressource">Gestion des Ressources</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-white" href="#" data-page="Notification">Notifications</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-white" href="#" data-page="MaintenanceDiagnosis">Diagnostics de Maintenance</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-white" href="#" data-page="Supplier">Fournisseurs</a>
-        </li>
-    </ul>
+
+<div class="sidebar">
+    <div class="sidebar-logo">
+        <h2>Messagerie App</h2>
+    </div>
+    <nav class="sidebar-nav">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a href="#" data-page="dashboard" class="nav-link active">
+                    <i class="fas fa-chart-pie"></i>Tableau de Bord
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="#" data-page="Ressource">
+                    <i class="fas fa-desktop"></i>Ressources
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="#" data-page="Notification">
+                    <i class="fas fa-bell"></i>Notifications
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="#" data-page="MaintenanceDiagnosis">
+                    <i class="fas fa-tools"></i>Maintenance
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="#" data-page="Supplier">
+                    <i class="fas fa-truck"></i>Fournisseurs
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="#" class="nav-link">
+            <i class="fas fa-sign-out-alt"></i>Déconnexion
+        </a>
+    </div>
 </div>
+
+<!-- Add Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+
+<!-- Add Bootstrap CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+
+<script>
+    // Handle browser back/forward
+    window.addEventListener('popstate', function (e) {
+        if (e.state && e.state.page) {
+            const page = e.state.page;
+
+            // Remove active class from all links
+            sidebarLinks.forEach(link => link.classList.remove('active'));
+
+            // Add active class to the current page link
+            const activeLink = document.querySelector(`.nav-link[data-page="${page}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+
+            // Load the page content
+            loadPage(page);
+        }
+    });
+    function loadPage(page) {
+        fetch(`/${page}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok: ${response.statusText}`);
+                }
+                return response.text();
+            })
+            .then(html => {
+                // Extract the content of the main-content div from the fetched HTML
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newContent = doc.getElementById('main-content');
+
+                if (newContent) {
+                    // Update the main content area
+                    mainContent.innerHTML = newContent.innerHTML;
+
+                    // Update browser history
+                    history.pushState({ page: page }, '', `/${page}`);
+
+                    // Remove active class from all links
+                    sidebarLinks.forEach(link => link.classList.remove('active'));
+
+                    // Add active class to the current page link
+                    const activeLink = document.querySelector(`.nav-link[data-page="${page}"]`);
+                    if (activeLink) {
+                        activeLink.classList.add('active');
+                    }
+                } else {
+                    console.error('main-content element not found in fetched HTML');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading page:', error);
+            });
+    }
+</script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="~/js/site.js"></script>

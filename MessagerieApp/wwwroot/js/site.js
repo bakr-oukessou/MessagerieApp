@@ -1,5 +1,5 @@
 ﻿document.addEventListener("DOMContentLoaded", function () {
-    const sidebarLinks = document.querySelectorAll('.sidebar .nav-link');
+    const sidebarLinks = document.querySelectorAll('.sidebar-nav .nav-link');
     const mainContent = document.getElementById('main-content');
 
     // Debug: Check if mainContent exists
@@ -12,6 +12,14 @@
     sidebarLinks.forEach(link => {
         link.addEventListener('click', function (event) {
             event.preventDefault();
+
+            // Remove active class from all links
+            sidebarLinks.forEach(link => link.classList.remove('active'));
+
+            // Add active class to the clicked link
+            this.classList.add('active');
+
+            // Load the page content
             const page = this.getAttribute('data-page');
             console.log('Loading page:', page);
             loadPage(page);
@@ -56,20 +64,6 @@
             loadPage(page);
         }
     });
-
-    // Update active navigation link
-    function updateActiveLink(activePage) {
-        // Remove active class from all links
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.classList.remove('active');
-        });
-
-        // Add active class to the current page link
-        const activeLink = document.querySelector(`.nav-link[data-page="${activePage}"]`);
-        if (activeLink) {
-            activeLink.classList.add('active');
-        }
-    }
 
     // Handle browser back/forward
     window.addEventListener('popstate', function (e) {
