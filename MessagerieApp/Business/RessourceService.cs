@@ -54,5 +54,20 @@ namespace MessagerieApp.Services
         {
             await _ressourceRepository.UpdateRessourceStatusAsync(ressourceId, status);
         }
+
+        public Task<IEnumerable<Ressource>> GetRessourcesByDepartmentAsync(int departmentId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<Ressource>> GetRessourcesByUserAsync(int userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task AddRessourceFromDemandeAsync(DemandeRessourceItem item)
+        {
+            await _ressourceRepository.AddRessourceFromDemandeAsync(item);
+        }
     }
 }

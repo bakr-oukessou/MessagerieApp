@@ -13,5 +13,8 @@ namespace MessagerieApp.Repository.Interfaces
         Task DeleteDemandeAsync(int id);
         Task UpdateDemandeStatusAsync(int demandeId, string status);
         Task<IEnumerable<DemandeRessource>> GetDemandesByDepartmentAsync(int departmentId);
+        Task<IEnumerable<DemandeRessourceItem>> GetDemandeRessourceItemsAsync(int demandeId);
+        Task AddDemandeRessourceItemAsync(DemandeRessourceItem item);
+
     }
 }

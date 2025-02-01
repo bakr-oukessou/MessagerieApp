@@ -1,79 +1,64 @@
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using MessagerieApp.Business.Interfaces;
 using MessagerieApp.Models;
+using MessagerieApp.Repositories;
+using MessagerieApp.Repository.Interfaces;
 using MessagerieApp.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MessagerieApp.Business.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 
 namespace MessagerieApp.Pages
 {
     public class RessourceModel : PageModel
     {
         private readonly IRessourceService _ressourceService;
+        private readonly IDemandeRessourceRepository _demandeRessourceRepository;
 
-        public RessourceModel(IRessourceService ressourceService)
+        public RessourceModel(IRessourceService ressourceService, IDemandeRessourceRepository demandeRessourceRepository)
         {
             _ressourceService = ressourceService;
+            _demandeRessourceRepository = demandeRessourceRepository;
         }
 
-        // List of resources to display
-        public IEnumerable<Ressource> Ressources { get; set; }
-
-        // Properties for creating a new resource
         [BindProperty]
-        public string InventoryNumber { get; set; }
+        public DemandeRessource NewDemandeRessource { get; set; } = new DemandeRessource();
 
         [BindProperty]
-        public string Type { get; set; }
+        public List<DemandeRessourceItem> NewDemandeRessourceItems { get; set; } = new List<DemandeRessourceItem>();
 
-        [BindProperty]
-        public string Brand { get; set; }
+        public List<DemandeRessource> Demandes { get; set; } = new List<DemandeRessource>();
 
-        [BindProperty]
-        public int? DepartmentId { get; set; }
-
-        [BindProperty]
-        public int? AssignedToUserId { get; set; }
-
-        [BindProperty]
-        public DateTime AcquisitionDate { get; set; }
-
-        [BindProperty]
-        public DateTime? WarrantyEndDate { get; set; }
-
-        [BindProperty]
-        public string Status { get; set; }
-
-        // Load resources on page load
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(int departmentId)
         {
-            Ressources = await _ressourceService.GetAllRessourcesAsync();
+            Demandes = (await _demandeRessourceRepository.GetDemandesByDepartmentAsync(departmentId)).ToList();
         }
 
-        // Handle form submission to create a new resource
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostCreateDemandeAsync()
         {
             if (!ModelState.IsValid)
             {
                 return Page();
             }
 
-            var ressource = new Ressource
+            NewDemandeRessource.RequestDate = DateTime.UtcNow;
+            NewDemandeRessource.Status = "Draft";
+            await _demandeRessourceRepository.AddDemandeAsync(NewDemandeRessource);
+
+            foreach (var item in NewDemandeRessourceItems)
             {
-                InventoryNumber = InventoryNumber,
-                Type = Type,
-                Brand = Brand,
-                DepartmentId = DepartmentId,
-                AssignedToUserId = AssignedToUserId,
-                AcquisitionDate = AcquisitionDate,
-                WarrantyEndDate = WarrantyEndDate,
-                Status = Status
-            };
+                item.ResourceRequestId = NewDemandeRessource.Id;
+                await _demandeRessourceRepository.AddDemandeRessourceItemAsync(item);
+            }
 
-            await _ressourceService.AddRessourceAsync(ressource);
+            TempData["SuccessMessage"] = "La demande de ressource a été créée avec succès.";
+            return RedirectToPage();
+        }
 
-            return RedirectToPage("/Ressource"); // Refresh the page
+        public async Task<IActionResult> OnPostAssignResourceAsync(int demandeId, int userId)
+        {
+            await _ressourceService.AssignRessourceToUserAsync(demandeId, userId);
+            return new JsonResult(new { success = true });
         }
     }
 }

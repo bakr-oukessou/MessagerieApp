@@ -14,5 +14,11 @@ namespace MessagerieApp.Business.Interfaces
         Task AssignRessourceToDepartmentAsync(int ressourceId, int departmentId);
         Task AssignRessourceToUserAsync(int ressourceId, int userId);
         Task UpdateRessourceStatusAsync(int ressourceId, string status);
+        Task<IEnumerable<Ressource>> GetRessourcesByDepartmentAsync(int departmentId);
+        Task<IEnumerable<Ressource>> GetRessourcesByUserAsync(int userId);
+
+        Task AddRessourceFromDemandeAsync(DemandeRessourceItem item);
+
+
     }
 }

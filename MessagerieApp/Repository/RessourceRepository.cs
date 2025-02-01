@@ -184,5 +184,36 @@ namespace MessagerieApp.Repositories
                 await command.ExecuteNonQueryAsync();
             }
         }
+        public async Task AddRessourceFromDemandeAsync(DemandeRessourceItem item)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                var command = new SqlCommand(
+                    "INSERT INTO Ressources (InventoryNumber, Type, Brand, DepartmentId, AssignedToUserId, AcquisitionDate, Status) " +
+                    "VALUES (@InventoryNumber, @Type, @Brand, @DepartmentId, @AssignedToUserId, @AcquisitionDate, @Status); SELECT SCOPE_IDENTITY();",
+                    connection);
+
+                command.Parameters.AddWithValue("@InventoryNumber", Guid.NewGuid().ToString()); // Generate a unique inventory number
+                command.Parameters.AddWithValue("@Type", item.Type);
+                command.Parameters.AddWithValue("@Brand", item.Specifications); // Use specifications as brand for simplicity
+                command.Parameters.AddWithValue("@DepartmentId", item.ResourceRequestId); // Use the demande ID as department ID
+                command.Parameters.AddWithValue("@AssignedToUserId", item.AssignedToUserId ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@AcquisitionDate", DateTime.UtcNow);
+                command.Parameters.AddWithValue("@Status", "Active");
+
+                await command.ExecuteNonQueryAsync();
+            }
+        }
+
+        public Task<IEnumerable<Ressource>> GetRessourcesByDepartmentAsync(int departmentId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<Ressource>> GetRessourcesByUserAsync(int userId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

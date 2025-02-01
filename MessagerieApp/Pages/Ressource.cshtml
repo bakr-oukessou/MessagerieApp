@@ -13,7 +13,6 @@
     .container {
         display: flex;
         flex-direction: column;
-        /* margin: auto; */
         background: white;
         padding: 20px;
         border-radius: 10px;
@@ -82,108 +81,94 @@
     tr:hover {
         background-color: #f1f1f1;
     }
+
+    .dropdown-menu {
+        min-width: 100px;
+    }
 </style>
 
 <div class="container">
-    <div class="container2">
-        <h2>Ressources</h2>
+    <!-- Button to trigger the modal -->
+    <button type="button" class="btn btn-primary mb-4" data-toggle="modal" data-target="#addResourceModal">
+        Ajouter une Ressource
+    </button>
 
-        <!-- Button to trigger the modal -->
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createResourceModal">
-            Créer une Ressource
-        </button>
-    </div>
-
-    <div class="container2">
-        <!-- List of resources -->
-        <h3>Liste des Ressources</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Numéro d'Inventaire</th>
-                    <th>Type</th>
-                    <th>Marque</th>
-                    <th>ID du Département</th>
-                    <th>ID de l'Utilisateur Assigné</th>
-                    <th>Date d'Acquisition</th>
-                    <th>Date de Fin de Garantie</th>
-                    <th>Statut</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var ressource in Model.Ressources)
-                {
-                    <tr>
-                        <td>@ressource.Id</td>
-                        <td>@ressource.InventoryNumber</td>
-                        <td>@ressource.Type</td>
-                        <td>@ressource.Brand</td>
-                        <td>@ressource.DepartmentId</td>
-                        <td>@ressource.AssignedToUserId</td>
-                        <td>@ressource.AcquisitionDate.ToShortDateString()</td>
-                        <td>@(ressource.WarrantyEndDate?.ToShortDateString() ?? "N/A")</td>
-                        <td>@ressource.Status</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- Modal for creating a new resource -->
-<div class="modal fade" id="createResourceModal" tabindex="-1" role="dialog" aria-labelledby="createResourceModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="createResourceModalLabel">Créer une Ressource</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Form to create a new resource -->
-                <form method="post">
-                    <div class="form-group">
-                        <label for="InventoryNumber">Numéro d'Inventaire</label>
-                        <input type="text" class="form-control" asp-for="InventoryNumber" required />
-                    </div>
-                    <div class="form-group">
-                        <label for="Type">Type</label>
-                        <input type="text" class="form-control" asp-for="Type" required />
-                    </div>
-                    <div class="form-group">
-                        <label for="Brand">Marque</label>
-                        <input type="text" class="form-control" asp-for="Brand" required />
-                    </div>
-                    <div class="form-group">
-                        <label for="DepartmentId">ID du Département</label>
-                        <input type="number" class="form-control" asp-for="DepartmentId" required />
-                    </div>
-                    <div class="form-group">
-                        <label for="AssignedToUserId">ID de l'Utilisateur Assigné</label>
-                        <input type="number" class="form-control" asp-for="AssignedToUserId" required />
-                    </div>
-                    <div class="form-group">
-                        <label for="AcquisitionDate">Date d'Acquisition</label>
-                        <input type="date" class="form-control" asp-for="AcquisitionDate" required />
-                    </div>
-                    <div class="form-group">
-                        <label for="WarrantyEndDate">Date de Fin de Garantie</label>
-                        <input type="date" class="form-control" asp-for="WarrantyEndDate" />
-                    </div>
-                    <div class="form-group">
-                        <label for="Status">Statut</label>
-                        <input type="text" class="form-control" asp-for="Status" required />
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
-                        <button type="submit" class="btn btn-primary">Créer</button>
-                    </div>
-                </form>
+    <!-- Modal for adding a new resource -->
+    <div class="modal fade" id="addResourceModal" tabindex="-1" role="dialog" aria-labelledby="addResourceModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addResourceModalLabel">Ajouter une Ressource</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form to create a new resource request -->
+                    <form method="post" asp-page-handler="CreateDemande">
+                        <div class="form-group">
+                            <label for="DepartmentId">ID du Département</label>
+                            <input type="number" class="form-control" asp-for="NewDemandeRessource.DepartmentId" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="RequestDate">Date de Demande</label>
+                            <input type="datetime-local" class="form-control" asp-for="NewDemandeRessource.RequestDate" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="Status">Statut</label>
+                            <input type="text" class="form-control" asp-for="NewDemandeRessource.Status" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="NewDemandeRessourceItems">Items de la Demande</label>
+                            <textarea class="form-control" asp-for="NewDemandeRessourceItems" rows="3" required></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                            <button type="submit" class="btn btn-primary">Créer</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- List of resource requests -->
+    <h3>Demandes de Ressources</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Département</th>
+                <th>Date de Demande</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var demande in Model.Demandes)
+            {
+                <tr>
+                    <td>@demande.Id</td>
+                    <td>@demande.DepartmentId</td>
+                    <td>@demande.RequestDate.ToString("dd/MM/yyyy")</td>
+                    <td>@demande.Status</td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton-@demande.Id" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Affecter
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton-@demande.Id">
+                                <!-- Example users for the dropdown -->
+                                <a class="dropdown-item" href="#" onclick="assignResource(@demande.Id, 1)">Enseignant 1</a>
+                                <a class="dropdown-item" href="#" onclick="assignResource(@demande.Id, 2)">Enseignant 2</a>
+                                <a class="dropdown-item" href="#" onclick="assignResource(@demande.Id, 3)">Enseignant 3</a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
 
 <!-- Add Font Awesome for icons -->
@@ -193,4 +178,22 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="~/js/site.js"></script>
+<script>
+    function assignResource(demandeId, userId) {
+        // Send an AJAX request to assign the resource
+        fetch(`/Ressource/AssignResource?demandeId=${demandeId}&userId=${userId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+            }
+        }).then(response => {
+            if (response.ok) {
+                alert('Ressource affectée avec succès !');
+                location.reload(); // Refresh the page to reflect changes
+            } else {
+                alert('Erreur lors de l\'affectation de la ressource.');
+            }
+        });
+    }
+</script>

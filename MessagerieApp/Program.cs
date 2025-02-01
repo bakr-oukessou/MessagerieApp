@@ -32,6 +32,7 @@ builder.Services.AddScoped<IMaintenanceDiagnosisRepository>(provider =>
 builder.Services.AddScoped<INotificationRepository>(provider =>
     new NotificationRepository(provider.GetRequiredService<string>()));
 
+
 // Enregistrement des services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDemandeRessourceService, DemandeRessourceService>();
