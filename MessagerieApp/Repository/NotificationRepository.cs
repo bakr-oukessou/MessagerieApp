@@ -29,19 +29,17 @@ namespace MessagerieApp.Repositories
                         notifications.Add(new Notification
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            EmetteurId = reader.GetInt32(reader.GetOrdinal("EmetteurId")),
-                            DestinataireId = reader.GetInt32(reader.GetOrdinal("DestinataireId")),
+                            DestinataireId = reader.GetInt32(reader.GetOrdinal("DestinataireId")), // Corrigé
                             Titre = reader.GetString(reader.GetOrdinal("Titre")),
                             Corps = reader.GetString(reader.GetOrdinal("Corps")),
                             Type = (NotificationType)reader.GetInt32(reader.GetOrdinal("Type")),
                             Statut = (StatutNotification)reader.GetInt32(reader.GetOrdinal("Statut")),
                             DateCreation = reader.GetDateTime(reader.GetOrdinal("DateCreation")),
-                            DateLecture = reader.IsDBNull(reader.GetOrdinal("DateLecture")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("DateLecture"))
+                            DateLecture = reader.IsDBNull(reader.GetOrdinal("DateLecture")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("DateLecture")),
                         });
                     }
                 }
             }
-
             return notifications;
         }
 
@@ -59,8 +57,7 @@ namespace MessagerieApp.Repositories
                     {
                         return new Notification
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            EmetteurId = reader.GetInt32(reader.GetOrdinal("EmetteurId")),
+                            EmetteurId = reader.GetInt32(reader.GetOrdinal("Id")),
                             DestinataireId = reader.GetInt32(reader.GetOrdinal("DestinataireId")),
                             Titre = reader.GetString(reader.GetOrdinal("Titre")),
                             Corps = reader.GetString(reader.GetOrdinal("Corps")),
@@ -82,7 +79,7 @@ namespace MessagerieApp.Repositories
             {
                 await connection.OpenAsync();
                 var command = new SqlCommand(
-                    "INSERT INTO Notifications (EmetteurId, DestinataireId, Titre, Corps, Type, Statut, DateCreation) " +
+                    "INSERT INTO Notifications (Id, DestinataireId, Titre, Corps, Type, Statut, DateCreation) " +
                     "VALUES (@EmetteurId, @DestinataireId, @Titre, @Corps, @Type, @Statut, @DateCreation); SELECT SCOPE_IDENTITY();",
                     connection);
 
@@ -104,13 +101,12 @@ namespace MessagerieApp.Repositories
             {
                 await connection.OpenAsync();
                 var command = new SqlCommand(
-                    "UPDATE Notifications SET EmetteurId = @EmetteurId, DestinataireId = @DestinataireId, Titre = @Titre, " +
+                    "UPDATE Notifications SET Id = @EmetteurId, DestinataireId = @DestinataireId, Titre = @Titre, " +
                     "Corps = @Corps, Type = @Type, Statut = @Statut, DateCreation = @DateCreation, DateLecture = @DateLecture " +
                     "WHERE Id = @Id",
                     connection);
 
-                command.Parameters.AddWithValue("@Id", notification.Id);
-                command.Parameters.AddWithValue("@EmetteurId", notification.EmetteurId);
+                command.Parameters.AddWithValue("@EmetteurId", notification.Id);
                 command.Parameters.AddWithValue("@DestinataireId", notification.DestinataireId);
                 command.Parameters.AddWithValue("@Titre", notification.Titre);
                 command.Parameters.AddWithValue("@Corps", notification.Corps);

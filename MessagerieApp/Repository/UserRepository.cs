@@ -33,7 +33,7 @@ namespace MessagerieApp.Repositories
                             UserName = reader.GetString(reader.GetOrdinal("UserName")),
                             Email = reader.GetString(reader.GetOrdinal("Email")),
                             Role = reader.GetString(reader.GetOrdinal("Role")),
-                            DepartementId = reader.IsDBNull(reader.GetOrdinal("DepartementId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("DepartementId"))
+                            DepartmentId = reader.IsDBNull(reader.GetOrdinal("DepartmentId")) ? (int?)null : reader.GetOrdinal("DepartmentId")
                         });
                     }
                 }
@@ -60,7 +60,7 @@ namespace MessagerieApp.Repositories
                             UserName = reader.GetString(reader.GetOrdinal("UserName")),
                             Email = reader.GetString(reader.GetOrdinal("Email")),
                             Role = reader.GetString(reader.GetOrdinal("Role")),
-                            DepartementId = reader.IsDBNull(reader.GetOrdinal("DepartementId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("DepartementId"))
+                            DepartmentId = reader.IsDBNull(reader.GetOrdinal("DepartmentId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("DepartmentId"))
                         };
                     }
                 }
@@ -87,7 +87,7 @@ namespace MessagerieApp.Repositories
                             UserName = reader.GetString(reader.GetOrdinal("UserName")),
                             Email = reader.GetString(reader.GetOrdinal("Email")),
                             Role = reader.GetString(reader.GetOrdinal("Role")),
-                            DepartementId = reader.IsDBNull(reader.GetOrdinal("DepartementId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("DepartementId"))
+                            DepartmentId = reader.IsDBNull(reader.GetOrdinal("DepartmentId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("DepartmentId"))
                         };
                     }
                 }
@@ -102,13 +102,13 @@ namespace MessagerieApp.Repositories
             {
                 await connection.OpenAsync();
                 var command = new SqlCommand(
-                    "INSERT INTO Users (UserName, Email, Role, DepartementId) VALUES (@UserName, @Email, @Role, @DepartementId); SELECT SCOPE_IDENTITY();",
+                    "INSERT INTO Users (UserName, Email, Role, DepartmentId) VALUES (@UserName, @Email, @Role, @DepartmentId); SELECT SCOPE_IDENTITY();",
                     connection);
 
                 command.Parameters.AddWithValue("@UserName", user.UserName);
                 command.Parameters.AddWithValue("@Email", user.Email);
                 command.Parameters.AddWithValue("@Role", user.Role);
-                command.Parameters.AddWithValue("@DepartementId", user.DepartementId ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@DepartmentId", user.DepartmentId ?? (object)DBNull.Value);
 
                 user.Id = Convert.ToInt32(await command.ExecuteScalarAsync());
             }
@@ -120,14 +120,14 @@ namespace MessagerieApp.Repositories
             {
                 await connection.OpenAsync();
                 var command = new SqlCommand(
-                    "UPDATE Users SET UserName = @UserName, Email = @Email, Role = @Role, DepartementId = @DepartementId WHERE Id = @Id",
+                    "UPDATE Users SET UserName = @UserName, Email = @Email, Role = @Role, DepartmentId = @DepartmentId WHERE Id = @Id",
                     connection);
 
                 command.Parameters.AddWithValue("@Id", user.Id);
                 command.Parameters.AddWithValue("@UserName", user.UserName);
                 command.Parameters.AddWithValue("@Email", user.Email);
                 command.Parameters.AddWithValue("@Role", user.Role);
-                command.Parameters.AddWithValue("@DepartementId", user.DepartementId ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("@DepartmentId", user.DepartmentId ?? (object)DBNull.Value);
 
                 await command.ExecuteNonQueryAsync();
             }
@@ -151,8 +151,8 @@ namespace MessagerieApp.Repositories
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
-                var command = new SqlCommand("SELECT * FROM Users WHERE DepartementId = @DepartementId", connection);
-                command.Parameters.AddWithValue("@DepartementId", departmentId);
+                var command = new SqlCommand("SELECT * FROM Users WHERE DepartmentId = @DepartmentId", connection);
+                command.Parameters.AddWithValue("@DepartmentId", departmentId);
 
                 using (var reader = await command.ExecuteReaderAsync())
                 {
@@ -164,7 +164,7 @@ namespace MessagerieApp.Repositories
                             UserName = reader.GetString(reader.GetOrdinal("UserName")),
                             Email = reader.GetString(reader.GetOrdinal("Email")),
                             Role = reader.GetString(reader.GetOrdinal("Role")),
-                            DepartementId = reader.GetInt32(reader.GetOrdinal("DepartementId"))
+                            DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId"))
                         });
                     }
                 }

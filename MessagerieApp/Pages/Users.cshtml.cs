@@ -1,26 +1,40 @@
-using MessagerieApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using MessagerieApp.Models;
+using MessagerieApp.Services;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using MessagerieApp.Business.Interfaces;
 
 namespace MessagerieApp.Pages
 {
     public class UsersModel : PageModel
     {
-        public List<User> UsersList { get; set; } = new List<User>();
+        private readonly IUserService _userService;
 
-        public void OnGet()
+        public UsersModel(IUserService userService)
         {
-            // Fetch users from the database or service
-            // Example:
-            // UsersList = _userService.GetAllUsers();
+            _userService = userService;
         }
 
-        public void OnPost(string username, string password, string role)
+        public List<User> UsersList { get; set; } = new();
+
+        public async Task<IActionResult> OnGetAsync()
         {
-            // Handle creation of a new user
-            // Example:
-            // var newUser = new User { Username = username, Password = password, Role = role };
-            // _userService.AddUser(newUser);
+            UsersList = (List<User>)await _userService.GetAllUsersAsync();
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostEditAsync(int id)
+        {
+            return RedirectToPage("/EditUser", new { id });
+        }
+
+        public async Task<IActionResult> OnPostDeleteAsync(int id)
+        {
+            await _userService.DeleteUserAsync(id);
+            TempData["SuccessMessage"] = "Utilisateur supprimé avec succès.";
+            return RedirectToPage();
         }
     }
 }

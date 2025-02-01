@@ -3,45 +3,94 @@
 @{
     ViewData["Title"] = "User Management";
 }
+<style>
 
-<h2>User Management</h2>
+    h2, h3 {
+        color: #343a40; /* Darker text color for headings */
+    }
 
-<form method="post">
-    <div>
-        <label for="Username">Username:</label>
-        <input type="text" id="Username" name="Username" />
-    </div>
-    <div>
-        <label for="Password">Password:</label>
-        <input type="password" id="Password" name="Password" />
-    </div>
-    <div>
-        <label for="Role">Role:</label>
-        <select id="Role" name="Role">
-            <option value="Admin">Admin</option>
-            <option value="Teacher">Teacher</option>
-            <option value="Technician">Technician</option>
-        </select>
-    </div>
-    <button type="submit">Add User</button>
-</form>
+    .table th, .table td {
+        vertical-align: middle; /* Center align table cells */
+    }
 
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Username</th>
-            <th>Role</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var user in Model.UsersList)
-        {
-            <tr>
-                <td>@user.Id</td>
-                <td>@user.UserName</td>
-                <td>@user.Role</td>
-            </tr>
+    .btn {
+        transition: background-color 0.3s ease; /* Smooth transition for button hover */
+    }
+
+        .btn:hover {
+            opacity: 0.9; /* Slightly fade buttons on hover */
         }
-    </tbody>
-</table>
+    table {
+        width: 100vw;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #667eea;
+        color: white;
+    }
+
+    tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .notification-card {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 10px;
+        transition: box-shadow 0.3s;
+    }
+
+        .notification-card:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .notification-actions {
+        display: flex;
+        gap: 10px;
+    }
+</style>
+
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Username</th>
+                <th>Departement</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model.UsersList)
+            {
+                <tr>
+                    <td>@user.Id</td>
+                    <td>@user.Email</td>
+                    <td>@user.UserName</td>
+                    <td>@user.Department</td>
+                    <td>@user.Role</td>
+                    <td class="notification-actions">
+                        <form method="post" asp-page-handler="Edit" asp-route-id="@user.Id" class="d-inline">
+                            <button type="submit" class="btn btn-success btn-sm">Edit</button>
+                        </form>
+                        <form method="post" asp-page-handler="Delete" asp-route-id="@user.Id" class="d-inline">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

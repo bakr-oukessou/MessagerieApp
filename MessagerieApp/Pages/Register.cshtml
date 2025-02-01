@@ -4,32 +4,49 @@
     ViewData["Title"] = "Register";
 }
 
-<h1>Register</h1>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Register New User</h2>
 
-<form method="post">
-    <div class="form-group">
-        <label for="Name">Name</label>
-        <input type="text" asp-for="Register.Name" class="form-control" />
-        <span asp-validation-for="Register.Name" class="text-danger"></span>
+    <form method="post" class="mb-4 p-4 border rounded shadow-sm bg-light">
+        <div class="form-group">
+            <label for="Username">Username:</label>
+            <input type="text" id="Username" name="Username" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <label for="Password">Password:</label>
+            <input type="password" id="Password" name="Password" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <label for="Role">Role:</label>
+            <select id="Role" name="Role" class="form-control" required>
+                <option value="Admin">Admin</option>
+                <option value="Teacher">Teacher</option>
+                <option value="Technician">Technician</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Register User</button>
+    </form>
+
+    <div class="text-center">
+        <a href="/UserManagement" class="btn btn-secondary">Back to User Management</a>
     </div>
+</div>
 
-    <div class="form-group">
-        <label for="Email">Email</label>
-        <input type="email" asp-for="Register.Email" class="form-control" />
-        <span asp-validation-for="Register.Email" class="text-danger"></span>
-    </div>
+<!-- Optional: Add custom styles -->
+<style>
+    body {
+        background-color: #f8f9fa; /* Light background for the page */
+    }
 
-    <div class="form-group">
-        <label for="Password">Password</label>
-        <input type="password" asp-for="Register.Password" class="form-control" />
-        <span asp-validation-for="Register.Password" class="text-danger"></span>
-    </div>
+    h2 {
+        color: #343a40; /* Darker text color for headings */
+    }
 
-    <div class="form-group">
-        <label for="ConfirmPassword">Confirm Password</label>
-        <input type="password" asp-for="Register.ConfirmPassword" class="form-control" />
-        <span asp-validation-for="Register.ConfirmPassword" class="text-danger"></span>
-    </div>
+    .btn {
+        transition: background-color 0.3s ease; /* Smooth transition for button hover */
+    }
 
-    <button type="submit" class="btn btn-primary">Register</button>
-</form>
+        .btn:hover {
+            opacity: 0.9; /* Slightly fade buttons on hover */
+        }
+</style>
