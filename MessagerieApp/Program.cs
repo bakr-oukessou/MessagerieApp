@@ -51,6 +51,24 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+if (app.Environment.IsDevelopment())
+{
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        OnPrepareResponse = ctx =>
+        {
+            // Disable caching for static files in development
+            ctx.Context.Response.Headers["Cache-Control"] = "no-cache, no-store";
+            ctx.Context.Response.Headers["Pragma"] = "no-cache";
+            ctx.Context.Response.Headers["Expires"] = "-1";
+        }
+    });
+}
+else
+{
+    app.UseStaticFiles(); // Use default caching in production
+}
+
 app.MapGet("/", async context =>
 {
     context.Response.Redirect("/Dashboard");

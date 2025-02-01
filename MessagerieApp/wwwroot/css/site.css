@@ -1,5 +1,6 @@
 html {
   font-size: 14px;
+  position: relative;
 }
 
 @media (min-width: 768px) {
@@ -8,14 +9,27 @@ html {
   }
 }
 
-html {
-  position: relative;
-  min-height: 100%;
-}
 :root {
     --primary-color: #667eea;
     --background-color: #f4f6f9;
     --text-color: #333;
+}
+/* Ensure the container and row take full height */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+.container-fluid {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+}
+
+.row {
+    flex: 1;
+    display: flex;
+    width: 100%;
 }
 
 body {
@@ -24,7 +38,19 @@ body {
     padding: 0;
     background-color: var(--background-color);
     display: flex;
-    height: 100vh;
+    /*height: 100vh;*/
+}
+
+#main-content {
+    flex: 1;
+    flex-grow: 1;
+    display: flex;
+    /*left: 25px;*/
+    flex-wrap:nowrap;
+    height: 100vh; /* Full height */
+    overflow-y: auto; /* Make main content scrollable */
+    overflow-x: hidden;
+    flex-direction:column;
 }
 
 /* Sidebar Styles */
@@ -35,11 +61,17 @@ body {
     padding: 20px;
     display: flex;
     flex-direction: column;
+    position: sticky;
+    top: 0;
+    overflow-y: auto; /* Allow sidebar to scroll if content is too long */
 }
 
 .sidebar-logo {
     text-align: center;
     margin-bottom: 30px;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 700;
 }
 
 .sidebar-nav {
@@ -82,10 +114,6 @@ body {
     padding: 20px;
     background-color: var(--background-color);
 }
-body {
-    background-color: #f4f6f9;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
 
 .sidebar {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -107,6 +135,7 @@ body {
     border-radius: 20px;
     box-shadow: 0 10px 20px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
+    height: 100%;
 }
 
     .dashboard-card:hover {
@@ -135,10 +164,24 @@ body {
 }
 
 .btn {
-    background-color: deepskyblue;
+    background-color: ##ffffff42;
     color: #333;
     border: none;
     border-radius: 5px;
     padding: 5px 10px;
     transition: all 0.3s ease;
+}
+@media (max-width: 768px) {
+    .form-control {
+        font-size: 16px;
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .table th, .table td {
+        padding: 8px;
+    }
 }

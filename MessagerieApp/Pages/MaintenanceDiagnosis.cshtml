@@ -4,83 +4,212 @@
     ViewData["Title"] = "Diagnostics de Maintenance";
 }
 
-<h2>Diagnostics de Maintenance</h2>
+<style>
+    h2, h3 {
+        color: #333;
+        margin-bottom: 20px;
+    }
 
-<!-- Form to create a new maintenance diagnosis -->
-<form method="post">
-    <div class="form-group">
-        <label for="Id">ID</label>
-        <input type="text" class="form-control" asp-for="MaintenanceDiagnosis.Id" />
-    </div>
-    <div class="form-group">
-        <label for="MaintenanceTicketId">ID du Ticket de Maintenance</label>
-        <input type="text" class="form-control" asp-for="MaintenanceDiagnosis.MaintenanceTicketId" />
-    </div>
-    <div class="form-group">
-        <label for="DiagnosisDate">Date du Diagnostic</label>
-        <input type="datetime-local" class="form-control" asp-for="MaintenanceDiagnosis.DiagnosisDate" />
-    </div>
-    <div class="form-group">
-        <label for="ProblemDescription">Description du Problème</label>
-        <textarea class="form-control" asp-for="MaintenanceDiagnosis.ProblemDescription"></textarea>
-    </div>
-    <div class="form-group">
-        <label for="Frequency">Fréquence</label>
-        <select class="form-control" asp-for="MaintenanceDiagnosis.Frequency">
-            <option value="Rare">Rare</option>
-            <option value="Frequent">Fréquent</option>
-            <option value="Permanent">Permanent</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="IssueType">Type de Problème</label>
-        <select class="form-control" asp-for="MaintenanceDiagnosis.IssueType">
-            <option value="Software">Logiciel</option>
-            <option value="Hardware">Matériel</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="RequiresReplacement">Nécessite un Remplacement</label>
-        <input type="checkbox" class="form-control" asp-for="MaintenanceDiagnosis.RequiresReplacement" />
-    </div>
-    <button type="submit" class="btn btn-primary">Créer un Diagnostic</button>
-</form>
+    .container {
+        max-width: 1200px;
+        /* margin: auto; */
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
 
-<!-- List of maintenance diagnoses -->
-<h3>Liste des Diagnostics</h3>
-<table class="table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>ID du Ticket</th>
-            <th>Date du Diagnostic</th>
-            <th>Description du Problème</th>
-            <th>Fréquence</th>
-            <th>Type de Problème</th>
-            <th>Nécessite un Remplacement</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var diagnosis in Model.MaintenanceDiagnoses)
-        {
-            <tr>
-                <td>@diagnosis.Id</td>
-                <td>@diagnosis.MaintenanceTicketId</td>
-                <td>@diagnosis.DiagnosisDate.ToShortDateString()</td>
-                <td>@diagnosis.ProblemDescription</td>
-                <td>@diagnosis.Frequency</td>
-                <td>@diagnosis.IssueType</td>
-                <td>@(diagnosis.RequiresReplacement ? "Oui" : "Non")</td>
-                <td>
-                    <form method="post" asp-page-handler="Update" asp-route-id="@diagnosis.Id">
-                        <button type="submit" class="btn btn-warning">Modifier</button>
-                    </form>
-                    <form method="post" asp-page-handler="Delete" asp-route-id="@diagnosis.Id">
-                        <button type="submit" class="btn btn-danger">Supprimer</button>
-                    </form>
-                </td>
-            </tr>
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="datetime-local"],
+    textarea,
+    select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: border-color 0.3s;
+    }
+
+        input[type="text"]:focus,
+        input[type="datetime-local"]:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #667eea;
+            outline: none;
         }
-    </tbody>
-</table>
+
+    .btn-primary {
+        background-color: #667eea;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .btn-primary:hover {
+            background-color: #5a6dbf;
+        }
+
+    .btn-warning {
+        background-color: #f39c12;
+        color: white;
+    }
+
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+
+    .btn-danger {
+        background-color: #e74c3c;
+        color: white;
+    }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #667eea;
+        color: white;
+    }
+
+    tr:hover {
+        background-color: #f1f1f1;
+    }
+</style>
+
+<div class="container">
+    <h2>Diagnostics de Maintenance</h2>
+
+    <!-- Button to trigger the modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createDiagnosisModal">
+        Créer un Diagnostic
+    </button>
+
+    <!-- Modal for creating a new maintenance diagnosis -->
+    <div class="modal fade" id="createDiagnosisModal" tabindex="-1" role="dialog" aria-labelledby="createDiagnosisModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createDiagnosisModalLabel">Créer un Diagnostic</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form to create a new maintenance diagnosis -->
+                    <form method="post">
+                        <div class="form-group">
+                            <label for="Id">ID</label>
+                            <input type="text" class="form-control" asp-for="MaintenanceDiagnosis.Id" />
+                        </div>
+                        <div class="form-group">
+                            <label for="MaintenanceTicketId">ID du Ticket de Maintenance</label>
+                            <input type="text" class="form-control" asp-for="MaintenanceDiagnosis.MaintenanceTicketId" />
+                        </div>
+                        <div class="form-group">
+                            <label for="DiagnosisDate">Date du Diagnostic</label>
+                            <input type="datetime-local" class="form-control" asp-for="MaintenanceDiagnosis.DiagnosisDate" />
+                        </div>
+                        <div class="form-group">
+                            <label for="ProblemDescription">Description du Problème</label>
+                            <textarea class="form-control" asp-for="MaintenanceDiagnosis.ProblemDescription"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="Frequency">Fréquence</label>
+                            <select class="form-control" asp-for="MaintenanceDiagnosis.Frequency">
+                                <option value="Rare">Rare</option>
+                                <option value="Frequent">Fréquent</option>
+                                <option value="Permanent">Permanent</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="IssueType">Type de Problème</label>
+                            <select class="form-control" asp-for="MaintenanceDiagnosis.IssueType">
+                                <option value="Software">Logiciel</option>
+                                <option value="Hardware">Matériel</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="RequiresReplacement">Nécessite un Remplacement</label>
+                            <input type="checkbox" class="form-control" asp-for="MaintenanceDiagnosis.RequiresReplacement" />
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                            <button type="submit" class="btn btn-primary">Créer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- List of maintenance diagnoses -->
+    <h3>Liste des Diagnostics</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>ID du Ticket</th>
+                <th>Date du Diagnostic</th>
+                <th>Description du Problème</th>
+                <th>Fréquence</th>
+                <th>Type de Problème</th>
+                <th>Nécessite un Remplacement</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var diagnosis in Model.MaintenanceDiagnoses)
+            {
+                <tr>
+                    <td>@diagnosis.Id</td>
+                    <td>@diagnosis.MaintenanceTicketId</td>
+                    <td>@diagnosis.DiagnosisDate.ToShortDateString()</td>
+                    <td>@diagnosis.ProblemDescription</td>
+                    <td>@diagnosis.Frequency</td>
+                    <td>@diagnosis.IssueType</td>
+                    <td>@(diagnosis.RequiresReplacement ? "Oui" : "Non")</td>
+                    <td>
+                        <form method="post" asp-page-handler="Update" asp-route-id="@diagnosis.Id">
+                            <button type="submit" class="btn btn-warning">Modifier</button>
+                        </form>
+                        <form method="post" asp-page-handler="Delete" asp-route-id="@diagnosis.Id">
+                            <button type="submit" class="btn btn-danger">Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Bootstrap and jQuery scripts -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

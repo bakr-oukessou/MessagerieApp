@@ -11,10 +11,18 @@ namespace MessagerieApp.Pages
     {
         private readonly INotificationService _notificationService;
 
+        [TempData]
+        public string SuccessMessage { get; set; }
+
         public NotificationModel(INotificationService notificationService)
         {
             _notificationService = notificationService;
         }
+
+
+        [BindProperty]
+        public Notification NewNotification { get; set; }
+
 
         // List of notifications to display
         public IEnumerable<Notification> Notifications { get; set; }
@@ -38,7 +46,16 @@ namespace MessagerieApp.Pages
         // Load notifications on page load
         public async Task OnGetAsync()
         {
-            Notifications = await _notificationService.GetAllNotificationsAsync();
+            try
+            {
+                Notifications = await _notificationService.GetAllNotificationsAsync();
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Error: {ex.Message}");
+                Notifications = new List<Notification>(); // Fallback to an empty list
+            }
         }
 
         // Handle form submission to create a new notification
@@ -61,10 +78,46 @@ namespace MessagerieApp.Pages
             };
 
             await _notificationService.AddNotificationAsync(notification);
+            SuccessMessage = "La notification a été ajoutée avec succès.";
+
 
             return RedirectToPage("/Notification"); // Refresh the page
         }
+        public async Task<IActionResult> OnPostCreateAsync()
+        {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
 
+            await _notificationService.AddNotificationAsync(NewNotification);
+
+            TempData["SuccessMessage"] = "La notification a été ajoutée avec succès.";
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostDeleteAsync(int id)
+        {
+            await _notificationService.DeleteNotificationAsync(id);
+
+            TempData["SuccessMessage"] = "La notification a été supprimée avec succès.";
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostEditAsync(int id)
+        {
+            var notification = await _notificationService.GetNotificationByIdAsync(id);
+            if (notification == null)
+            {
+                return NotFound();
+            }
+
+            // Update logic here (e.g., bind to a form and save changes)
+            await _notificationService.UpdateNotificationAsync(notification);
+
+            TempData["SuccessMessage"] = "La notification a été modifiée avec succès.";
+            return RedirectToPage();
+        }
         // Mark a notification as read
         public async Task<IActionResult> OnPostMarkAsReadAsync(int id)
         {

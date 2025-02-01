@@ -4,77 +4,254 @@
     ViewData["Title"] = "Notifications";
 }
 
-<h2>Notifications</h2>
+<style>
+    h2, h3 {
+        color: #333;
+        margin-bottom: 20px;
+    }
 
-<!-- Form to create a new notification -->
-<form method="post">
-    <div class="form-group">
-        <label for="EmetteurId">ID de l'Émetteur</label>
-        <input type="number" class="form-control" asp-for="EmetteurId" />
-    </div>
-    <div class="form-group">
-        <label for="DestinataireId">ID du Destinataire</label>
-        <input type="number" class="form-control" asp-for="DestinataireId" />
-    </div>
-    <div class="form-group">
-        <label for="Titre">Titre</label>
-        <input type="text" class="form-control" asp-for="Titre" />
-    </div>
-    <div class="form-group">
-        <label for="Corps">Corps</label>
-        <textarea class="form-control" asp-for="Corps"></textarea>
-    </div>
-    <div class="form-group">
-        <label for="Type">Type de Notification</label>
-        <select class="form-control" asp-for="Type">
-            <option value="0">DemandeBesoins</option>
-            <option value="1">AppelOffre</option>
-            <option value="2">Maintenance</option>
-            <option value="3">Livraison</option>
-            <option value="4">Rejet</option>
-            <option value="5">Acceptation</option>
-        </select>
-    </div>
-    <button type="submit" class="btn btn-primary">Créer une Notification</button>
-</form>
+    .container {
+        max-width: 1200px;
+        /* margin: auto; */
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
 
-<!-- List of notifications -->
-<h3>Liste des Notifications</h3>
-<table class="table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Émetteur</th>
-            <th>Destinataire</th>
-            <th>Titre</th>
-            <th>Corps</th>
-            <th>Type</th>
-            <th>Statut</th>
-            <th>Date de Création</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var notification in Model.Notifications)
-        {
-            <tr>
-                <td>@notification.Id</td>
-                <td>@notification.EmetteurId</td>
-                <td>@notification.DestinataireId</td>
-                <td>@notification.Titre</td>
-                <td>@notification.Corps</td>
-                <td>@notification.Type</td>
-                <td>@notification.Statut</td>
-                <td>@notification.DateCreation</td>
-                <td>
-                    <form method="post" asp-page-handler="MarkAsRead" asp-route-id="@notification.Id">
-                        <button type="submit" class="btn btn-success">Marquer comme Lu</button>
-                    </form>
-                    <form method="post" asp-page-handler="MarkAsArchived" asp-route-id="@notification.Id">
-                        <button type="submit" class="btn btn-warning">Archiver</button>
-                    </form>
-                </td>
-            </tr>
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    textarea,
+    select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: border-color 0.3s;
+    }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #667eea;
+            outline: none;
         }
-    </tbody>
-</table>
+
+    .btn-primary {
+        background-color: #667eea;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .btn-primary:hover {
+            background-color: #5a6dbf;
+        }
+
+    .btn-success {
+        background-color: #28a745;
+        color: white;
+    }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+    .btn-warning {
+        background-color: #ffc107;
+        color: black;
+    }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #667eea;
+        color: white;
+    }
+
+    tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .notification-card {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 10px;
+        transition: box-shadow 0.3s;
+    }
+
+        .notification-card:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .notification-actions {
+        display: flex;
+        gap: 10px;
+    }
+</style>
+
+<div class="container">
+    <h2>Notifications</h2>
+
+    <!-- Button to trigger the modal -->
+    <button type="button" class="btn btn-primary mb-4" data-toggle="modal" data-target="#createNotificationModal">
+        Créer une Notification
+    </button>
+
+    <!-- Modal for creating a new notification -->
+    <div class="modal fade" id="createNotificationModal" tabindex="-1" role="dialog" aria-labelledby="createNotificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createNotificationModalLabel">Créer une Notification</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form to create a new notification -->
+                    <form method="post" asp-page-handler="Create">
+                        <div class="form-group">
+                            <label for="EmetteurId">ID de l'Émetteur</label>
+                            <input type="number" class="form-control" asp-for="NewNotification.EmetteurId" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="DestinataireId">ID du Destinataire</label>
+                            <input type="number" class="form-control" asp-for="NewNotification.DestinataireId" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="Titre">Titre</label>
+                            <input type="text" class="form-control" asp-for="NewNotification.Titre" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="Corps">Corps</label>
+                            <textarea class="form-control" asp-for="NewNotification.Corps" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="Type">Type de Notification</label>
+                            <select class="form-control" asp-for="NewNotification.Type" required>
+                                <option value="DemandeBesoins">DemandeBesoins</option>
+                                <option value="AppelOffre">AppelOffre</option>
+                                <option value="Maintenance">Maintenance</option>
+                                <option value="Livraison">Livraison</option>
+                                <option value="Rejet">Rejet</option>
+                                <option value="Acceptation">Acceptation</option>
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                            <button type="submit" class="btn btn-primary">Créer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- List of notifications -->
+    <h3>Liste des Notifications</h3>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Émetteur</th>
+                    <th>Destinataire</th>
+                    <th>Titre</th>
+                    <th>Corps</th>
+                    <th>Type</th>
+                    <th>Statut</th>
+                    <th>Date de Création</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var notification in Model.Notifications)
+                {
+                    <tr>
+                        <td>@notification.Id</td>
+                        <td>@notification.EmetteurId</td>
+                        <td>@notification.DestinataireId</td>
+                        <td>@notification.Titre</td>
+                        <td>@notification.Corps</td>
+                        <td>@notification.Type</td>
+                        <td>@notification.Statut</td>
+                        <td>@notification.DateCreation.ToString("dd/MM/yyyy")</td>
+                        <td class="notification-actions">
+                            <form method="post" asp-page-handler="MarkAsRead" asp-route-id="@notification.Id" class="d-inline">
+                                <button type="submit" class="btn btn-success btn-sm">Marquer comme Lu</button>
+                            </form>
+                            <form method="post" asp-page-handler="MarkAsArchived" asp-route-id="@notification.Id" class="d-inline">
+                                <button type="submit" class="btn btn-warning btn-sm">Archiver</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- Toast Container -->
+<div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 1050;">
+    <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+        <div class="toast-header bg-success text-white">
+            <strong class="me-auto">Succès</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            L'élément a été ajouté avec succès.
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap and jQuery scripts -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Check if TempData contains a success message
+        var successMessage = '@TempData["SuccessMessage"]';
+        if (successMessage) {
+            // Update the toast body with the success message
+            $('#successToast .toast-body').text(successMessage);
+
+            // Show the toast
+            var toast = new bootstrap.Toast(document.getElementById('successToast'));
+            toast.show();
+        }
+    });
+</script>
