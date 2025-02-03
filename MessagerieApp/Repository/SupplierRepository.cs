@@ -2,165 +2,169 @@
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using MessagerieApp.Models;
+using System.Data;
 
 namespace MessagerieApp.Repositories
 {
-    public class SupplierRepository : ISupplierRepository
-    {
-        private readonly string _connectionString;
+	public class SupplierRepository : ISupplierRepository
+	{
+		private readonly string _connectionString;
 
-        public SupplierRepository(string connectionString)
-        {
-            _connectionString = connectionString;
-        }
+		public SupplierRepository(string connectionString)
+		{
+			_connectionString = connectionString;
+		}
 
-        public async Task<IEnumerable<Supplier>> GetAllSuppliersAsync()
-        {
-            var suppliers = new List<Supplier>();
+		public async Task<IEnumerable<Supplier>> GetAllSuppliersAsync()
+		{
+			var suppliers = new List<Supplier>();
 
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                await connection.OpenAsync();
-                var command = new SqlCommand("SELECT * FROM Fournisseur", connection);
-                using (var reader = await command.ExecuteReaderAsync())
-                {
-                    while (await reader.ReadAsync())
-                    {
-                        suppliers.Add(new Supplier
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            CompanyName = reader.GetString(reader.GetOrdinal("CompanyName")),
-                            Location = reader.GetString(reader.GetOrdinal("Location")),
-                            Address = reader.GetString(reader.GetOrdinal("Address")),
-                            Website = reader.GetString(reader.GetOrdinal("Website")),
-                            ManagerName = reader.GetString(reader.GetOrdinal("ManagerName")),
-                            IsBlacklisted = reader.GetBoolean(reader.GetOrdinal("IsBlacklisted")),
-                            BlacklistReason = reader.IsDBNull(reader.GetOrdinal("BlacklistReason")) ? null : reader.GetString(reader.GetOrdinal("BlacklistReason"))
-                        });
-                    }
-                }
-            }
+			using (var connection = new SqlConnection(_connectionString))
+			{
+				await connection.OpenAsync();
+				var command = new SqlCommand("SELECT * FROM Fournisseur", connection); // Nom de table en anglais
 
-            return suppliers;
-        }
+				using (var reader = await command.ExecuteReaderAsync())
+				{
+					while (await reader.ReadAsync())
+					{
+						suppliers.Add(new Supplier
+						{
+							Id = reader.GetInt32(reader.GetOrdinal("Id")),
+							CompanyName = reader.GetString(reader.GetOrdinal("CompanyName")),
 
-        public async Task<Supplier> GetSupplierByIdAsync(int id)
-        {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                await connection.OpenAsync();
-                var command = new SqlCommand("SELECT * FROM Fournisseur WHERE Id = @Id", connection);
-                command.Parameters.AddWithValue("@Id", id);
+							IsBlacklisted = reader.GetBoolean(reader.GetOrdinal("IsBlacklisted")),
+							BlacklistReason = reader.IsDBNull(reader.GetOrdinal("BlacklistReason")) ? null : reader.GetString(reader.GetOrdinal("BlacklistReason"))
+						});
+					}
+				}
+			}
 
-                using (var reader = await command.ExecuteReaderAsync())
-                {
-                    if (await reader.ReadAsync())
-                    {
-                        return new Supplier
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            CompanyName = reader.GetString(reader.GetOrdinal("CompanyName")),
-                            Location = reader.GetString(reader.GetOrdinal("Location")),
-                            Address = reader.GetString(reader.GetOrdinal("Address")),
-                            Website = reader.GetString(reader.GetOrdinal("Website")),
-                            ManagerName = reader.GetString(reader.GetOrdinal("ManagerName")),
-                            IsBlacklisted = reader.GetBoolean(reader.GetOrdinal("IsBlacklisted")),
-                            BlacklistReason = reader.IsDBNull(reader.GetOrdinal("BlacklistReason")) ? null : reader.GetString(reader.GetOrdinal("BlacklistReason"))
-                        };
-                    }
-                }
-            }
+			return suppliers;
+		}
 
-            return null;
-        }
+		public async Task<Supplier> GetSupplierByIdAsync(int id)
+		{
+			using (var connection = new SqlConnection(_connectionString))
+			{
+				await connection.OpenAsync();
+				var command = new SqlCommand("SELECT * FROM Suppliers WHERE Id = @Id", connection);
+				command.Parameters.AddWithValue("@Id", id);
 
-        public async Task AddSupplierAsync(Supplier supplier)
-        {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                await connection.OpenAsync();
-                var command = new SqlCommand(
-                    "INSERT INTO Fournisseur (CompanyName, Location, Address, Website, ManagerName, IsBlacklisted, BlacklistReason) " +
-                    "VALUES (@CompanyName, @Location, @Address, @Website, @ManagerName, @IsBlacklisted, @BlacklistReason); SELECT SCOPE_IDENTITY();",
-                    connection);
+				using (var reader = await command.ExecuteReaderAsync())
+				{
+					if (await reader.ReadAsync())
+					{
+						return new Supplier
+						{
+							Id = reader.GetInt32(reader.GetOrdinal("Id")),
+							CompanyName = reader.GetString(reader.GetOrdinal("CompanyName")),
 
-                command.Parameters.AddWithValue("@CompanyName", supplier.CompanyName);
-                command.Parameters.AddWithValue("@Location", supplier.Location);
-                command.Parameters.AddWithValue("@Address", supplier.Address);
-                command.Parameters.AddWithValue("@Website", supplier.Website);
-                command.Parameters.AddWithValue("@ManagerName", supplier.ManagerName);
-                command.Parameters.AddWithValue("@IsBlacklisted", supplier.IsBlacklisted);
-                command.Parameters.AddWithValue("@BlacklistReason", supplier.BlacklistReason ?? (object)DBNull.Value);
+							IsBlacklisted = reader.GetBoolean(reader.GetOrdinal("IsBlacklisted")),
+							BlacklistReason = reader.IsDBNull(reader.GetOrdinal("BlacklistReason")) ? null : reader.GetString(reader.GetOrdinal("BlacklistReason"))
+						};
+					}
+				}
+			}
 
-                supplier.Id = Convert.ToInt32(await command.ExecuteScalarAsync());
-            }
-        }
+			return null;
+		}
 
-        public async Task UpdateSupplierAsync(Supplier supplier)
-        {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                await connection.OpenAsync();
-                var command = new SqlCommand(
-                    "UPDATE Fournisseur SET CompanyName = @CompanyName, Location = @Location, Address = @Address, " +
-                    "Website = @Website, ManagerName = @ManagerName, IsBlacklisted = @IsBlacklisted, BlacklistReason = @BlacklistReason " +
-                    "WHERE Id = @Id",
-                    connection);
+		private (byte[] passwordHash, byte[] passwordSalt) CreatePasswordHash(string password)
+		{
+			using (var hmac = new System.Security.Cryptography.HMACSHA512())
+			{
+				return (hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password)), hmac.Key);
+			}
+		}
 
-                command.Parameters.AddWithValue("@Id", supplier.Id);
-                command.Parameters.AddWithValue("@CompanyName", supplier.CompanyName);
-                command.Parameters.AddWithValue("@Location", supplier.Location);
-                command.Parameters.AddWithValue("@Address", supplier.Address);
-                command.Parameters.AddWithValue("@Website", supplier.Website);
-                command.Parameters.AddWithValue("@ManagerName", supplier.ManagerName);
-                command.Parameters.AddWithValue("@IsBlacklisted", supplier.IsBlacklisted);
-                command.Parameters.AddWithValue("@BlacklistReason", supplier.BlacklistReason ?? (object)DBNull.Value);
+		public async Task AddSupplierAsync(Supplier supplier)
+		{
+			using var connection = new SqlConnection(_connectionString);
+			await connection.OpenAsync();
 
-                await command.ExecuteNonQueryAsync();
-            }
-        }
+			var command = new SqlCommand(
+				@"INSERT INTO Supplier (CompanyName, IsBlacklisted, BlacklistReason) 
+        VALUES (@CompanyName, @IsBlacklisted, @BlacklistReason);
+        SELECT SCOPE_IDENTITY();",
+				connection);
 
-        public async Task DeleteSupplierAsync(int id)
-        {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                await connection.OpenAsync();
-                var command = new SqlCommand("DELETE FROM Fournisseur WHERE Id = @Id", connection);
-                command.Parameters.AddWithValue("@Id", id);
+			command.Parameters.AddWithValue("@CompanyName", supplier.CompanyName);
+			command.Parameters.AddWithValue("@IsBlacklisted", supplier.IsBlacklisted);
+			command.Parameters.AddWithValue("@BlacklistReason",
+				(object)supplier.BlacklistReason ?? DBNull.Value);
 
-                await command.ExecuteNonQueryAsync();
-            }
-        }
+			supplier.Id = Convert.ToInt32(await command.ExecuteScalarAsync());
+		}
 
-        public async Task BlacklistSupplierAsync(int id, string reason)
-        {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                await connection.OpenAsync();
-                var command = new SqlCommand(
-                    "UPDATE Fournisseur SET IsBlacklisted = 1, BlacklistReason = @BlacklistReason WHERE Id = @Id",
-                    connection);
 
-                command.Parameters.AddWithValue("@Id", id);
-                command.Parameters.AddWithValue("@BlacklistReason", reason);
 
-                await command.ExecuteNonQueryAsync();
-            }
-        }
+		public async Task UpdateSupplierAsync(Supplier supplier)
+		{
+			using (var connection = new SqlConnection(_connectionString))
+			{
+				await connection.OpenAsync();
+				var command = new SqlCommand(
+					@"UPDATE Suppliers 
+                    SET CompanyName = @CompanyName, 
+                        Location = @Location, 
 
-        public async Task RemoveFromBlacklistAsync(int id)
-        {
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                await connection.OpenAsync();
-                var command = new SqlCommand(
-                    "UPDATE Fournisseur SET IsBlacklisted = 0, BlacklistReason = NULL WHERE Id = @Id",
-                    connection);
+                        IsBlacklisted = @IsBlacklisted, 
+                        BlacklistReason = @BlacklistReason 
+                    WHERE Id = @Id",
+					connection);
 
-                command.Parameters.AddWithValue("@Id", id);
+				command.Parameters.AddWithValue("@Id", supplier.Id);
+				command.Parameters.AddWithValue("@CompanyName", supplier.CompanyName);
 
-                await command.ExecuteNonQueryAsync();
-            }
-        }
-    }
+				command.Parameters.AddWithValue("@IsBlacklisted", supplier.IsBlacklisted);
+				command.Parameters.AddWithValue("@BlacklistReason", supplier.BlacklistReason ?? (object)DBNull.Value);
+
+				await command.ExecuteNonQueryAsync();
+			}
+		}
+
+		public async Task DeleteSupplierAsync(int id)
+		{
+			using (var connection = new SqlConnection(_connectionString))
+			{
+				await connection.OpenAsync();
+				var command = new SqlCommand("DELETE FROM Suppliers WHERE Id = @Id", connection);
+				command.Parameters.AddWithValue("@Id", id);
+
+				await command.ExecuteNonQueryAsync();
+			}
+		}
+
+		public async Task BlacklistSupplierAsync(int id, string reason)
+		{
+			using (var connection = new SqlConnection(_connectionString))
+			{
+				await connection.OpenAsync();
+				var command = new SqlCommand(
+					"UPDATE Suppliers SET IsBlacklisted = 1, BlacklistReason = @BlacklistReason WHERE Id = @Id",
+					connection);
+
+				command.Parameters.AddWithValue("@Id", id);
+				command.Parameters.AddWithValue("@BlacklistReason", reason);
+
+				await command.ExecuteNonQueryAsync();
+			}
+		}
+
+		public async Task RemoveFromBlacklistAsync(int id)
+		{
+			using (var connection = new SqlConnection(_connectionString))
+			{
+				await connection.OpenAsync();
+				var command = new SqlCommand(
+					"UPDATE Suppliers SET IsBlacklisted = 0, BlacklistReason = NULL WHERE Id = @Id",
+					connection);
+
+				command.Parameters.AddWithValue("@Id", id);
+
+				await command.ExecuteNonQueryAsync();
+			}
+		}
+	}
 }
