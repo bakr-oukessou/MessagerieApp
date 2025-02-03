@@ -1,4 +1,14 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    // Récupérer le chemin actuel
+    var currentPath = HttpContextAccessor.HttpContext?.Request.Path.Value ?? "";
+    var hideSidebarPages = new List<string> { "/Login", "/RegisterSupplier" };
+    var showSidebar = HttpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated == true && !hideSidebarPages.Contains(currentPath);
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -29,6 +39,21 @@
             <div class="toast-body">
                 L'élément a été ajouté avec succès.
             </div>
+            @if (showSidebar)
+            {
+                <!-- Afficher la sidebar uniquement si l'utilisateur est authentifié et que ce n'est pas Login/Register -->
+                <partial name="_Sidebar" />
+                <div class="col-md-9 p-4" id="main-content">
+                    @RenderBody()
+                </div>
+            }
+            else
+            {
+                <!-- Pleine largeur pour login/register -->
+                <div class="col-12 p-4" id="main-content">
+                    @RenderBody()
+                </div>
+            }
         </div>
         <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="4000">
             <div class="toast-header bg-danger text-white">
@@ -68,5 +93,6 @@
             }
         });
     </script>   
+
 </body>
 </html>

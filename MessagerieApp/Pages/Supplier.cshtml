@@ -170,22 +170,7 @@
                     <label for="CompanyName">Nom de l'entreprise</label>
                     <input type="text" asp-for="Supplier.CompanyName" required />
                 </div>
-                <div class="form-group">
-                    <label for="Location">Localisation</label>
-                    <input type="text" asp-for="Supplier.Location" required />
-                </div>
-                <div class="form-group">
-                    <label for="Address">Adresse</label>
-                    <input type="text" asp-for="Supplier.Address" required />
-                </div>
-                <div class="form-group">
-                    <label for="Website">Site web</label>
-                    <input type="text" asp-for="Supplier.Website" />
-                </div>
-                <div class="form-group">
-                    <label for="ManagerName">Nom du gérant</label>
-                    <input type="text" asp-for="Supplier.ManagerName" required />
-                </div>
+
                 <button type="submit" class="modal-submit-btn">Créer un Fournisseur</button>
             </form>
         </div>
@@ -198,10 +183,7 @@
             <tr>
                 <th>ID</th>
                 <th>Nom de l'entreprise</th>
-                <th>Localisation</th>
-                <th>Adresse</th>
-                <th>Site web</th>
-                <th>Nom du gérant</th>
+
                 <th>Blacklisté</th>
                 <th>Raison de la blacklist</th>
                 <th>Actions</th>
@@ -213,10 +195,7 @@
                 <tr>
                     <td>@supplier.Id</td>
                     <td>@supplier.CompanyName</td>
-                    <td>@supplier.Location</td>
-                    <td>@supplier.Address</td>
-                    <td>@supplier.Website</td>
-                    <td>@supplier.ManagerName</td>
+
                     <td>@(supplier.IsBlacklisted ? "Oui" : "Non")</td>
                     <td>@supplier.BlacklistReason</td>
                     <td>
