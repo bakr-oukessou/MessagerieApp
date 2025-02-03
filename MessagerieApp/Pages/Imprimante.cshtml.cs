@@ -1,10 +1,10 @@
-using MessagerieApp.Models;
+using MessagerieApp.Models.MasterData;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace MessagerieApp.Pages
 {
-    public class ImprimanteModel : PageModel
+	public class ImprimanteModel : PageModel
     {
         public List<Imprimante> ImprimantesList { get; set; } = new List<Imprimante>();
 

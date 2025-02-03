@@ -1,10 +1,10 @@
-using MessagerieApp.Models;
+using MessagerieApp.Models.TransactionData;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace MessagerieApp.Pages
 {
-    public class MessagesModel : PageModel
+	public class MessagesModel : PageModel
     {
         public List<Message> MessagesList { get; set; } = new List<Message>();
 

@@ -1,11 +1,10 @@
-﻿using MessagerieApp.Business.Interfaces;
-using MessagerieApp.Models;
-using MessagerieApp.Repository.Interfaces;
-using MessagerieApp.Services;
+﻿using MessagerieApp.Business.Interfaces.TransactionData;
+using MessagerieApp.Models.TransactionData;
+using MessagerieApp.Repository.Interfaces.TransactionData;
 
 namespace MessagerieApp.Business
 {
-    public class OffreService : IOffreService
+	public class OffreService : IOffreService
     {
         private readonly IOffreRepository _offreRepository;
         private readonly INotificationService _notificationService;

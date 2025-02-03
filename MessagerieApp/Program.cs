@@ -1,8 +1,12 @@
 ﻿using MessagerieApp.Business;
-using MessagerieApp.Business.Interfaces;
+using MessagerieApp.Business.Interfaces.MasterData;
+using MessagerieApp.Business.Interfaces.TransactionData;
+using MessagerieApp.Business.Interfaces.TransversalData;
 using MessagerieApp.Data;
 using MessagerieApp.Repositories;
-using MessagerieApp.Repository.Interfaces;
+using MessagerieApp.Repository.Interfaces.MasterData;
+using MessagerieApp.Repository.Interfaces.TransactionData;
+using MessagerieApp.Repository.Interfaces.TransversalData;
 using MessagerieApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);

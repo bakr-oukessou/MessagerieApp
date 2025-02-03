@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MessagerieApp.Models;
-using MessagerieApp.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using MessagerieApp.Business.Interfaces.TransactionData;
 
 namespace MessagerieApp.Pages
 {
-    public class DemandeRessourceItemModel : PageModel
+	public class DemandeRessourceItemModel : PageModel
     {
         private readonly IDemandeRessourceService _demandeRessourceService;
 
@@ -46,7 +46,7 @@ namespace MessagerieApp.Pages
                 return Page();
             }
 
-            var item = new DemandeRessourceItem
+            var item = new RessourceItem
             {
                 ResourceRequestId = DemandeRessourceId,
                 Type = ResourceType,

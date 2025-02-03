@@ -1,11 +1,12 @@
-﻿using MessagerieApp.Repositories;
-using MessagerieApp.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using MessagerieApp.Business.Interfaces.TransactionData;
+using MessagerieApp.Models.TransactionData;
+using MessagerieApp.Repository.Interfaces.TransactionData;
 
 namespace MessagerieApp.Services
 {
-    public class MaintenanceDiagnosisService : IMaintenanceDiagnosisService
+	public class MaintenanceDiagnosisService : IMaintenanceDiagnosisService
     {
         private readonly IMaintenanceDiagnosisRepository _maintenanceDiagnosisRepository;
 

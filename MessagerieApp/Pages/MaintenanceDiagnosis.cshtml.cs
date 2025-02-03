@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MessagerieApp.Models;
-using MessagerieApp.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using MessagerieApp.Models.TransactionData;
+using MessagerieApp.Business.Interfaces.TransactionData;
 
 namespace MessagerieApp.Pages
 {
-    public class MaintenanceDiagnosisModel : PageModel
+	public class MaintenanceDiagnosisModel : PageModel
     {
         private readonly IMaintenanceDiagnosisService _maintenanceDiagnosisService;
 

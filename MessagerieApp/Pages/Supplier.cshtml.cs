@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MessagerieApp.Models;
-using MessagerieApp.Services;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using MessagerieApp.Business.Interfaces.TransversalData;
 
 namespace MessagerieApp.Pages
 {
-    public class SupplierModel : PageModel
+	public class SupplierModel : PageModel
     {
         private readonly ISupplierService _supplierService;
 
@@ -15,10 +15,12 @@ namespace MessagerieApp.Pages
             _supplierService = supplierService;
         }
 
+
         public IEnumerable<Supplier> Suppliers { get; set; }
 
+
         [BindProperty]
-        public Supplier Supplier { get; set; }
+        public Fournisseur Supplier { get; set; }
 
         public async Task OnGetAsync()
         {

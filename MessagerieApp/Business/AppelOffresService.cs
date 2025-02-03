@@ -1,9 +1,9 @@
 ﻿using MessagerieApp.Models;
-using MessagerieApp.Repository.Interfaces;
+using MessagerieApp.Repository.Interfaces.TransactionData;
 
 namespace MessagerieApp.Business
 {
-    public class AppelOffresService
+	public class AppelOffresService
     {
         private readonly IAppelOffresRepository _repository;
 

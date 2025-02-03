@@ -1,10 +1,10 @@
-using MessagerieApp.Models;
+using MessagerieApp.Models.MasterData;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace MessagerieApp.Pages
 {
-    public class ComputerModel : PageModel
+	public class ComputerModel : PageModel
     {
         public List<Computer> ComputersList { get; set; } = new List<Computer>();
 

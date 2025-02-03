@@ -1,15 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MessagerieApp.Models;
 using MessagerieApp.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MessagerieApp.Models.TransversalData;
+using MessagerieApp.Business.Interfaces.TransversalData;
 using MessagerieApp.Business.Interfaces;
 using System.Data;
 
 namespace MessagerieApp.Pages
 {
-    public class UsersModel : PageModel
+	public class UsersModel : PageModel
     {
         private readonly IUserService _userService;
 
@@ -78,7 +79,7 @@ namespace MessagerieApp.Pages
                 return RedirectToPage();
             }
 
-            TempData["SuccessMessage"] = "supprimé avec succès.";
+            TempData["SuccessMessage"] = "supprimÃ© avec succÃ¨s.";
             return RedirectToPage();
         }
     }

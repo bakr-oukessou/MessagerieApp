@@ -1,11 +1,12 @@
 ﻿using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using MessagerieApp.Models;
+using MessagerieApp.Models.TransactionData;
+using MessagerieApp.Repository.Interfaces.TransactionData;
 
 namespace MessagerieApp.Repositories
 {
-    public class NotificationRepository : INotificationRepository
+	public class NotificationRepository : INotificationRepository
     {
         private readonly string _connectionString;
 

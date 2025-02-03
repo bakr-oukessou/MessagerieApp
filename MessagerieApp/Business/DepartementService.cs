@@ -1,11 +1,12 @@
-﻿using MessagerieApp.Repositories;
-using MessagerieApp.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using MessagerieApp.Business.Interfaces.MasterData;
+using MessagerieApp.Models.MasterData;
+using MessagerieApp.Repository.Interfaces.MasterData;
 
 namespace MessagerieApp.Services
 {
-    public class DepartementService : IDepartementService
+	public class DepartementService : IDepartementService
     {
         private readonly IDepartementRepository _departementRepository;
 

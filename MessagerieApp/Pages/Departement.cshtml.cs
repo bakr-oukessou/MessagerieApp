@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MessagerieApp.Models;
-using MessagerieApp.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using MessagerieApp.Models.MasterData;
+using MessagerieApp.Business.Interfaces.MasterData;
 
 namespace MessagerieApp.Pages
 {
-    public class DepartementModel : PageModel
+	public class DepartementModel : PageModel
     {
         private readonly IDepartementService _departementService;
 

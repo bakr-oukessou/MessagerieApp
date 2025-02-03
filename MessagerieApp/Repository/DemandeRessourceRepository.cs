@@ -1,12 +1,13 @@
 ﻿using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using MessagerieApp.Models;
-using MessagerieApp.Repository.Interfaces;
+using MessagerieApp.Models.MasterData;
+using MessagerieApp.Models.TransactionData;
+using MessagerieApp.Repository.Interfaces.TransactionData;
 
 namespace MessagerieApp.Repositories
 {
-    public class DemandeRessourceRepository : IDemandeRessourceRepository
+	public class DemandeRessourceRepository : IDemandeRessourceRepository
     {
         private readonly string _connectionString;
 
@@ -158,7 +159,7 @@ namespace MessagerieApp.Repositories
 
             return demandes;
         }
-        public async Task AddDemandeRessourceItemAsync(DemandeRessourceItem item)
+        public async Task AddDemandeRessourceItemAsync(RessourceItem item)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -178,9 +179,9 @@ namespace MessagerieApp.Repositories
             }
         }
 
-        public async Task<IEnumerable<DemandeRessourceItem>> GetDemandeRessourceItemsAsync(int demandeId)
+        public async Task<IEnumerable<RessourceItem>> GetDemandeRessourceItemsAsync(int demandeId)
         {
-            var items = new List<DemandeRessourceItem>();
+            var items = new List<RessourceItem>();
 
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -192,7 +193,7 @@ namespace MessagerieApp.Repositories
                 {
                     while (await reader.ReadAsync())
                     {
-                        items.Add(new DemandeRessourceItem
+                        items.Add(new RessourceItem
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             ResourceRequestId = reader.GetInt32(reader.GetOrdinal("ResourceRequestId")),
@@ -208,7 +209,7 @@ namespace MessagerieApp.Repositories
             return items;
         }
 
-        public async Task AssignResourcesToTeachersAsync(int demandeId, IEnumerable<DemandeRessourceItem> assignments)
+        public async Task AssignResourcesToTeachersAsync(int demandeId, IEnumerable<RessourceItem> assignments)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -238,6 +239,106 @@ namespace MessagerieApp.Repositories
                 }
             }
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public async Task<DemandeRessource> GetByIdAsync(int id)
+    {
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            await connection.OpenAsync();
+            var command = new SqlCommand("SELECT * FROM DemandeRessource WHERE Id = @Id", connection);
+            command.Parameters.AddWithValue("@Id", id);
+
+            using (var reader = await command.ExecuteReaderAsync())
+            {
+                if (await reader.ReadAsync())
+                {
+                    return new DemandeRessource
+                    {
+                        Id = (int)reader["Id"],
+                        Title = reader["Title"].ToString(),
+                        Content = reader["Content"].ToString(),
+                        DepartmentId = (int)reader["DepartmentId"]
+                    };
+                }
+            }
+        }
+        return null;
+    }
+
+    public async Task<List<DemandeRessource>> GetAllAsync()
+    {
+        var demandes = new List<DemandeRessource>();
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            await connection.OpenAsync();
+            var command = new SqlCommand("SELECT * FROM DemandeRessource", connection);
+
+            using (var reader = await command.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync())
+                {
+                    demandes.Add(new DemandeRessource
+                    {
+                        Id = (int)reader["Id"],
+                        Title = reader["Title"].ToString(),
+                        Content = reader["Content"].ToString(),
+                        DepartmentId = (int)reader["DepartmentId"]
+                    });
+                }
+            }
+        }
+        return demandes;
+    }
+
+    public async Task AddAsync(DemandeRessource demande)
+    {
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            await connection.OpenAsync();
+            var command = new SqlCommand("INSERT INTO DemandeRessource (Title, Content, DepartmentId) VALUES (@Title, @Content, @DepartmentId)", connection);
+            command.Parameters.AddWithValue("@Title", demande.Title);
+            command.Parameters.AddWithValue("@Content", demande.Content);
+            command.Parameters.AddWithValue("@DepartmentId", demande.DepartmentId);
+            await command.ExecuteNonQueryAsync();
+        }
+    }
+
+    public async Task UpdateAsync(DemandeRessource demande)
+    {
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            await connection.OpenAsync();
+            var command = new SqlCommand("UPDATE DemandeRessource SET Title = @Title, Content = @Content WHERE Id = @Id", connection);
+            command.Parameters.AddWithValue("@Id", demande.Id);
+            command.Parameters.AddWithValue("@Title", demande.Title);
+            command.Parameters.AddWithValue("@Content", demande.Content);
+            await command.ExecuteNonQueryAsync();
+        }
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            await connection.OpenAsync();
+            var command = new SqlCommand("DELETE FROM DemandeRessource WHERE Id = @Id", connection);
+            command.Parameters.AddWithValue("@Id", id);
+            await command.ExecuteNonQueryAsync();
+        }
+    }
     }
 
 }

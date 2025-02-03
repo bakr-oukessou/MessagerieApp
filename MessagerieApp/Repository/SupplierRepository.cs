@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using MessagerieApp.Models;
 using System.Data;
+using MessagerieApp.Repository.Interfaces.TransversalData;
 
 namespace MessagerieApp.Repositories
 {
@@ -15,9 +16,9 @@ namespace MessagerieApp.Repositories
 			_connectionString = connectionString;
 		}
 
-		public async Task<IEnumerable<Supplier>> GetAllSuppliersAsync()
+		public async Task<IEnumerable<Fournisseur>> GetAllSuppliersAsync()
 		{
-			var suppliers = new List<Supplier>();
+			var suppliers = new List<Fournisseur>();
 
 			using (var connection = new SqlConnection(_connectionString))
 			{
@@ -28,7 +29,7 @@ namespace MessagerieApp.Repositories
 				{
 					while (await reader.ReadAsync())
 					{
-						suppliers.Add(new Supplier
+						suppliers.Add(new Fournisseur
 						{
 							Id = reader.GetInt32(reader.GetOrdinal("Id")),
 							CompanyName = reader.GetString(reader.GetOrdinal("CompanyName")),
@@ -43,7 +44,7 @@ namespace MessagerieApp.Repositories
 			return suppliers;
 		}
 
-		public async Task<Supplier> GetSupplierByIdAsync(int id)
+		public async Task<Fournisseur> GetSupplierByIdAsync(int id)
 		{
 			using (var connection = new SqlConnection(_connectionString))
 			{
@@ -55,7 +56,7 @@ namespace MessagerieApp.Repositories
 				{
 					if (await reader.ReadAsync())
 					{
-						return new Supplier
+						return new Fournisseur
 						{
 							Id = reader.GetInt32(reader.GetOrdinal("Id")),
 							CompanyName = reader.GetString(reader.GetOrdinal("CompanyName")),
@@ -78,7 +79,7 @@ namespace MessagerieApp.Repositories
 			}
 		}
 
-		public async Task AddSupplierAsync(Supplier supplier)
+		public async Task AddSupplierAsync(Fournisseur supplier)
 		{
 			using var connection = new SqlConnection(_connectionString);
 			await connection.OpenAsync();
@@ -99,7 +100,7 @@ namespace MessagerieApp.Repositories
 
 
 
-		public async Task UpdateSupplierAsync(Supplier supplier)
+		public async Task UpdateSupplierAsync(Fournisseur supplier)
 		{
 			using (var connection = new SqlConnection(_connectionString))
 			{

@@ -1,8 +1,8 @@
 ﻿using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using MessagerieApp.Models;
-using MessagerieApp.Repository.Interfaces;
+using MessagerieApp.Models.TransversalData;
+using MessagerieApp.Repository.Interfaces.TransversalData;
 
 namespace MessagerieApp.Repositories
 {

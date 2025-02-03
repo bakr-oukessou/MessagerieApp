@@ -1,12 +1,12 @@
 ﻿using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using MessagerieApp.Models;
-using MessagerieApp.Repository.Interfaces;
+using MessagerieApp.Models.MasterData;
+using MessagerieApp.Repository.Interfaces.MasterData;
 
 namespace MessagerieApp.Repositories
 {
-    public class RessourceRepository : IRessourceRepository
+	public class RessourceRepository : IRessourceRepository
     {
         private readonly string _connectionString;
 
@@ -184,7 +184,7 @@ namespace MessagerieApp.Repositories
                 await command.ExecuteNonQueryAsync();
             }
         }
-        public async Task AddRessourceFromDemandeAsync(DemandeRessourceItem item)
+        public async Task AddRessourceFromDemandeAsync(RessourceItem item)
         {
             using (var connection = new SqlConnection(_connectionString))
             {

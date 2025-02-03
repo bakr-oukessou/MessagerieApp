@@ -1,10 +1,10 @@
-using MessagerieApp.Models;
+using MessagerieApp.Models.TransactionData;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace MessagerieApp.Pages
 {
-    public class AppelOffresItemModel : PageModel
+	public class AppelOffresItemModel : PageModel
     {
         public List<AppelOffresItem> AppelOffresItemList { get; set; } = new List<AppelOffresItem>();
 

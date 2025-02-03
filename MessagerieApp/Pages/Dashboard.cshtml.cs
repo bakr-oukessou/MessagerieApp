@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MessagerieApp.Services;
 using System.Threading.Tasks;
-using MessagerieApp.Business.Interfaces;
+using MessagerieApp.Business.Interfaces.TransactionData;
+using MessagerieApp.Business.Interfaces.MasterData;
 
 namespace MessagerieApp.Pages
 {
-    public class DashboardModel : PageModel
+	public class DashboardModel : PageModel
     {
         private readonly IRessourceService _ressourceService;
         private readonly INotificationService _notificationService;

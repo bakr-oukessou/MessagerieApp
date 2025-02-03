@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
-using MessagerieApp.Repository.Interfaces;
+using MessagerieApp.Repository.Interfaces.TransversalData;
 
 namespace MessagerieApp.Pages
 {

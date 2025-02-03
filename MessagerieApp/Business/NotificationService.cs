@@ -1,12 +1,13 @@
-﻿using MessagerieApp.Repositories;
-using MessagerieApp.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using MessagerieApp.Repository.Interfaces;
+using MessagerieApp.Business.Interfaces.TransactionData;
+using MessagerieApp.Models.TransactionData;
+using MessagerieApp.Repository.Interfaces.TransactionData;
+using MessagerieApp.Repository.Interfaces.TransversalData;
 
 namespace MessagerieApp.Services
 {
-    public class NotificationService : INotificationService
+	public class NotificationService : INotificationService
     {
         private readonly INotificationRepository _notificationRepository;
         private readonly IUserRepository _utilisateurRepository;
