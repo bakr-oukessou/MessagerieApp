@@ -15,20 +15,16 @@ namespace MessagerieApp.Pages
             _supplierService = supplierService;
         }
 
-        // List of suppliers to display
         public IEnumerable<Supplier> Suppliers { get; set; }
 
-        // Properties for creating/editing a supplier
         [BindProperty]
         public Supplier Supplier { get; set; }
 
-        // Load suppliers on page load
         public async Task OnGetAsync()
         {
             Suppliers = await _supplierService.GetAllSuppliersAsync();
         }
 
-        // Handle form submission to create a new supplier
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
@@ -37,12 +33,10 @@ namespace MessagerieApp.Pages
             }
 
             await _supplierService.AddSupplierAsync(Supplier);
-
-            return RedirectToPage("/Supplier"); // Refresh the page
+            return RedirectToPage("/Supplier");
         }
 
-        // Handle form submission to update a supplier
-        public async Task<IActionResult> OnPostUpdateAsync(int id)
+        public async Task<IActionResult> OnPostUpdateAsync()
         {
             if (!ModelState.IsValid)
             {
@@ -50,32 +44,25 @@ namespace MessagerieApp.Pages
             }
 
             await _supplierService.UpdateSupplierAsync(Supplier);
-
-            return RedirectToPage("/Supplier"); // Refresh the page
+            return RedirectToPage("/Supplier");
         }
 
-        // Handle form submission to delete a supplier
         public async Task<IActionResult> OnPostDeleteAsync(int id)
         {
             await _supplierService.DeleteSupplierAsync(id);
-
-            return RedirectToPage("/Supplier"); // Refresh the page
+            return RedirectToPage("/Supplier");
         }
 
-        // Handle form submission to blacklist a supplier
         public async Task<IActionResult> OnPostBlacklistAsync(int id, string reason)
         {
             await _supplierService.BlacklistSupplierAsync(id, reason);
-
-            return RedirectToPage("/Supplier"); // Refresh the page
+            return RedirectToPage("/Supplier");
         }
 
-        // Handle form submission to remove a supplier from the blacklist
         public async Task<IActionResult> OnPostRemoveFromBlacklistAsync(int id)
         {
             await _supplierService.RemoveFromBlacklistAsync(id);
-
-            return RedirectToPage("/Supplier"); // Refresh the page
+            return RedirectToPage("/Supplier");
         }
     }
 }

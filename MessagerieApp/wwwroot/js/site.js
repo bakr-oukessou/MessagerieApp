@@ -72,3 +72,56 @@
         }
     });
 });
+
+    // Add Modal Functions
+    function openAddModal() {
+        document.getElementById("addSupplierModal").style.display = "block";
+    }
+
+    function closeAddModal() {
+        document.getElementById("addSupplierModal").style.display = "none";
+    }
+
+    function toggleBlacklistReason(select) {
+        const blacklistReasonGroup = document.getElementById("blacklistReasonGroup");
+    if (select.value === "true") {
+        blacklistReasonGroup.style.display = "block";
+        } else {
+        blacklistReasonGroup.style.display = "none";
+        }
+    }
+
+    // Edit Modal Functions
+    function openEditModal(id, companyName, isBlacklisted, blacklistReason) {
+        document.getElementById("editSupplierModal").style.display = "block";
+    document.getElementById("editSupplierId").value = id;
+    document.getElementById("editCompanyName").value = companyName;
+    document.getElementById("editIsBlacklisted").value = isBlacklisted.toString();
+    toggleEditBlacklistReason(document.getElementById("editIsBlacklisted"));
+    if (isBlacklisted) {
+        document.getElementById("editBlacklistReason").value = blacklistReason;
+        }
+    }
+
+    function closeEditModal() {
+        document.getElementById("editSupplierModal").style.display = "none";
+    }
+
+    function toggleEditBlacklistReason(select) {
+        const editBlacklistReasonGroup = document.getElementById("editBlacklistReasonGroup");
+    if (select.value === "true") {
+        editBlacklistReasonGroup.style.display = "block";
+        } else {
+        editBlacklistReasonGroup.style.display = "none";
+        }
+    }
+
+    // Close modals when clicking outside
+    window.onclick = function (event) {
+        if (event.target == document.getElementById("addSupplierModal")) {
+        closeAddModal();
+        }
+    if (event.target == document.getElementById("editSupplierModal")) {
+        closeEditModal();
+        }
+    }

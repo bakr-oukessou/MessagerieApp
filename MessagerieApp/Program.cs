@@ -4,26 +4,11 @@ using MessagerieApp.Data;
 using MessagerieApp.Repositories;
 using MessagerieApp.Repository.Interfaces;
 using MessagerieApp.Services;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Enregistre les repositories
-builder.Services.AddScoped<UserRepository>();
-builder.Services.AddScoped<SupplierRepository>();
-
-builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
 // Récupération de la chaîne de connexion
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-builder.Services.AddScoped<IUserRepository>(provider =>
-	new UserRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Enregistrement des services pour l'injection de dépendances
 builder.Services.AddRazorPages();
@@ -33,19 +18,20 @@ builder.Services.AddSingleton(connectionString);
 
 // Enregistrement des repositories avec injection manuelle de la chaîne de connexion
 builder.Services.AddScoped<IUserRepository>(provider =>
-	new UserRepository(provider.GetRequiredService<string>()));
+    new UserRepository(provider.GetRequiredService<string>()));
 builder.Services.AddScoped<IDemandeRessourceRepository>(provider =>
-	new DemandeRessourceRepository(provider.GetRequiredService<string>()));
+    new DemandeRessourceRepository(provider.GetRequiredService<string>()));
 builder.Services.AddScoped<IRessourceRepository>(provider =>
-	new RessourceRepository(provider.GetRequiredService<string>()));
+    new RessourceRepository(provider.GetRequiredService<string>()));
 builder.Services.AddScoped<IDepartementRepository>(provider =>
-	new DepartementRepository(provider.GetRequiredService<string>()));
+    new DepartementRepository(provider.GetRequiredService<string>()));
 builder.Services.AddScoped<ISupplierRepository>(provider =>
-	new SupplierRepository(provider.GetRequiredService<string>()));
+    new SupplierRepository(provider.GetRequiredService<string>()));
 builder.Services.AddScoped<IMaintenanceDiagnosisRepository>(provider =>
-	new MaintenanceDiagnosisRepository(provider.GetRequiredService<string>()));
+    new MaintenanceDiagnosisRepository(provider.GetRequiredService<string>()));
 builder.Services.AddScoped<INotificationRepository>(provider =>
-	new NotificationRepository(provider.GetRequiredService<string>()));
+    new NotificationRepository(provider.GetRequiredService<string>()));
+
 
 // Enregistrement des services
 builder.Services.AddScoped<IUserService, UserService>();
@@ -56,61 +42,42 @@ builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IMaintenanceDiagnosisService, MaintenanceDiagnosisService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 
-builder.Services.AddRazorPages(options =>
-{
-	options.Conventions.AuthorizeFolder("/"); 
-	options.Conventions.AllowAnonymousToPage("/Login");
-	options.Conventions.AllowAnonymousToPage("/Logout");
-	options.Conventions.AllowAnonymousToPage("/RegisterSupplier"); ;
-});
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-	.AddCookie(options =>
-	{
-		options.Cookie.HttpOnly = true;
-		options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-		options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-		options.LoginPath = "/Login";
-		options.LogoutPath = "/Logout";
-		options.AccessDeniedPath = "/AccessDenied";
-	}); ;
-
-builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+// Configuration du pipeline de requêtes HTTP
 if (!app.Environment.IsDevelopment())
 {
-	app.UseExceptionHandler("/Error");
-	app.UseHsts();
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
 }
 
 if (app.Environment.IsDevelopment())
 {
-	app.UseStaticFiles(new StaticFileOptions
-	{
-		OnPrepareResponse = ctx =>
-		{
-			ctx.Context.Response.Headers["Cache-Control"] = "no-cache, no-store";
-			ctx.Context.Response.Headers["Pragma"] = "no-cache";
-			ctx.Context.Response.Headers["Expires"] = "-1";
-		}
-	});
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        OnPrepareResponse = ctx =>
+        {
+            // Disable caching for static files in development
+            ctx.Context.Response.Headers["Cache-Control"] = "no-cache, no-store";
+            ctx.Context.Response.Headers["Pragma"] = "no-cache";
+            ctx.Context.Response.Headers["Expires"] = "-1";
+        }
+    });
 }
 else
 {
-	app.UseStaticFiles(); 
+    app.UseStaticFiles(); // Use default caching in production
 }
 
 app.MapGet("/", async context =>
 {
-	context.Response.Redirect("/Login");
+    context.Response.Redirect("/Dashboard");
 });
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
