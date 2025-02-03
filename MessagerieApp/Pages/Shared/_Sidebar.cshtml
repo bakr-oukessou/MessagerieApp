@@ -1,16 +1,4 @@
-﻿@using Microsoft.AspNetCore.Http
-@inject IHttpContextAccessor HttpContextAccessor
-
-@{
-    var user = HttpContextAccessor.HttpContext?.User;
-    bool isAdmin = user?.IsInRole("Admin") ?? false;
-    bool isResponsable = user?.IsInRole("ResourceManager") ?? false;
-    bool isChef = user?.IsInRole("DepartmentHead") ?? false;
-    bool isEnseignant = user?.IsInRole("Teacher") ?? false;
-    bool isTechnicien = user?.IsInRole("MaintenanceStaff") ?? false;
-    bool isFournisseur = user?.IsInRole("Supplier") ?? false;
-}
-
+﻿﻿
 <div class="sidebar">
     <div class="sidebar-logo">
         <h2>Messagerie App</h2>
@@ -22,80 +10,39 @@
                     <i class="fas fa-chart-pie"></i>Tableau de Bord
                 </a>
             </li>
-
-            @if (isAdmin || isResponsable || isChef)
-            {
-				<li class="nav-item">
-					<a href="c:\users\geams\onedrive\bureau\messagerieapp\messagerieapp\pages\shared\_sidebar.cshtml">c:\users\geams\onedrive\bureau\messagerieapp\messagerieapp\pages\shared\_sidebar.cshtml</a>
-                    <a class="nav-link text-white" href="#" data-page="Ressource">
-                        <i class="fas fa-desktop"></i>Ressources
-                    </a>
-                </li>
-            }
-
-            @if (isAdmin || isResponsable || isChef)
-            {
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="#" data-page="Notification">
-                        <i class="fas fa-bell"></i>Notifications
-                    </a>
-                </li>
-            }
-
-            @if (isAdmin || isEnseignant || isTechnicien)
-            {
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="#" data-page="MaintenanceDiagnosis">
-                        <i class="fas fa-tools"></i>Maintenance
-                    </a>
-                </li>
-            }
-
-            @if (isAdmin || isResponsable || isFournisseur)
-            {
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="#" data-page="Supplier">
-                        <i class="fas fa-truck"></i>Fournisseurs
-                    </a>
-                </li>
-            }
-
-            @if (isAdmin)
-            {
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="#" data-page="Users">
-                        <i class="fas fa-user"></i>Utilisateurs
-                    </a>
-                </li>
-            }
-
-            @if (User.IsInRole("Enseignant"))
-            {
-                <li class="nav-item">
-                    <a class="nav-link" asp-page="/DemandeRessource">Mes Demandes de Ressources</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-page="/Notifications">Notifications</a>
-                </li>
-            }
-            @if (User.IsInRole("ChefDepartement"))
-            {
-                <li class="nav-item">
-                    <a class="nav-link" asp-page="/ValidationDemandes">Validation des Demandes</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-page="/Statistiques">Statistiques</a>
-                </li>
-            }
+            <li class="nav-item">
+                <a class="nav-link text-white" href="#" data-page="Ressource">
+                    <i class="fas fa-desktop"></i>Ressources
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="#" data-page="Notification">
+                    <i class="fas fa-bell"></i>Notifications
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="#" data-page="MaintenanceDiagnosis">
+                    <i class="fas fa-tools"></i>Maintenance
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="#" data-page="Supplier">
+                    <i class="fas fa-truck"></i>Fournisseurs
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="#" data-page="Users">
+                    <i class="fas fa-user"></i>User
+                </a>
+            </li>
         </ul>
     </nav>
-
     <div class="sidebar-footer">
-        <a href="/Logout" class="nav-link" data-page="Logout">Déconnexion
+        <a href="#" class="nav-link">
+            <i class="fas fa-sign-out-alt"></i>Déconnexion
         </a>
     </div>
 </div>
-
 
 <!-- Add Font Awesome for icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />

@@ -1,13 +1,4 @@
-﻿@using Microsoft.AspNetCore.Http
-@inject IHttpContextAccessor HttpContextAccessor
-
-@{
-    // Récupérer le chemin actuel
-    var currentPath = HttpContextAccessor.HttpContext?.Request.Path.Value ?? "";
-    var hideSidebarPages = new List<string> { "/Login", "/RegisterSupplier" };
-    var showSidebar = HttpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated == true && !hideSidebarPages.Contains(currentPath);
-}
-
+﻿﻿
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,21 +12,24 @@
 <body>
     <div class="container-fluid">
         <div class="row">
-            @if (showSidebar)
-            {
-                <!-- Afficher la sidebar uniquement si l'utilisateur est authentifié et que ce n'est pas Login/Register -->
-                <partial name="_Sidebar" />
-                <div class="col-md-9 p-4" id="main-content">
-                    @RenderBody()
-                </div>
-            }
-            else
-            {
-                <!-- Pleine largeur pour login/register -->
-                <div class="col-12 p-4" id="main-content">
-                    @RenderBody()
-                </div>
-            }
+            <!-- Sidebar -->
+            <partial name="_Sidebar" />
+            <!-- Main Content -->
+            <div class="col-md-9 p-4" id="main-content">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+    <!-- Toast Container -->
+    <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 1050;">
+        <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+            <div class="toast-header bg-success text-white">
+                <strong class="me-auto">Succès</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                L'élément a été ajouté avec succès.
+            </div>
         </div>
     </div>
 
@@ -43,5 +37,19 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="~/js/site.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Check if TempData contains a success message
+            var successMessage = '@TempData["SuccessMessage"]';
+            if (successMessage) {
+                // Update the toast body with the success message
+                $('#successToast .toast-body').text(successMessage);
+
+                // Show the toast
+                var toast = new bootstrap.Toast(document.getElementById('successToast'));
+                toast.show();
+            }
+        });
+    </script>
 </body>
 </html>

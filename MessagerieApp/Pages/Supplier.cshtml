@@ -147,7 +147,25 @@
         cursor: pointer;
         font-size: 0.8em;
     }
+    .confirm-modal {
+        display: none;
+        position: fixed;
+        z-index: 1100;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+    }
 
+    .confirm-modal-content {
+        background-color: white;
+        margin: 15% auto;
+        padding: 20px;
+        border-radius: 10px;
+        width: 300px;
+        text-align: center;
+    }
     .btn-warning { background-color: #ffc107; color: white; }
     .btn-danger { background-color: #dc3545; color: white; }
     .btn-dark { background-color: #343a40; color: white; }
@@ -157,21 +175,59 @@
 
 <div class="container">
     <h2>Fournisseurs</h2>
-    
-    <button onclick="openModal()" class="btn-add-supplier">Ajouter un Fournisseur</button>
 
-    <!-- Modal Form -->
-    <div id="supplierModal" class="modal">
+    <!-- Button to open the Add Modal -->
+    <button onclick="openAddModal()" class="btn-add-supplier">Ajouter un Fournisseur</button>
+
+    <!-- Add Modal -->
+    <div id="addSupplierModal" class="modal">
         <div class="modal-content">
-            <span class="modal-close" onclick="closeModal()">&times;</span>
-            <h3>Nouveau Fournisseur</h3>
-            <form method="post">
+            <span class="modal-close" onclick="closeAddModal()">&times;</span>
+            <h3>Ajouter un Fournisseur</h3>
+            <form method="post" asp-page-handler="Add">
                 <div class="form-group">
                     <label for="CompanyName">Nom de l'entreprise</label>
                     <input type="text" asp-for="Supplier.CompanyName" required />
                 </div>
+                <div class="form-group">
+                    <label for="IsBlacklisted">Blacklisté</label>
+                    <select asp-for="Supplier.IsBlacklisted" onchange="toggleBlacklistReason(this)">
+                        <option value="false">Non</option>
+                        <option value="true">Oui</option>
+                    </select>
+                </div>
+                <div class="form-group" id="blacklistReasonGroup" style="display: none;">
+                    <label for="BlacklistReason">Raison de la blacklist</label>
+                    <input type="text" asp-for="Supplier.BlacklistReason" />
+                </div>
+                <button type="submit" class="modal-submit-btn">Ajouter</button>
+            </form>
+        </div>
+    </div>
 
-                <button type="submit" class="modal-submit-btn">Créer un Fournisseur</button>
+    <!-- Edit Modal -->
+    <div id="editSupplierModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeEditModal()">&times;</span>
+            <h3>Modifier Fournisseur</h3>
+            <form method="post" asp-page-handler="Update">
+                <input type="hidden" asp-for="Supplier.Id" id="editSupplierId" />
+                <div class="form-group">
+                    <label for="CompanyName">Nom de l'entreprise</label>
+                    <input type="text" asp-for="Supplier.CompanyName" id="editCompanyName" required />
+                </div>
+                <div class="form-group">
+                    <label for="IsBlacklisted">Blacklisté</label>
+                    <select asp-for="Supplier.IsBlacklisted" id="editIsBlacklisted" onchange="toggleEditBlacklistReason(this)">
+                        <option value="false">Non</option>
+                        <option value="true">Oui</option>
+                    </select>
+                </div>
+                <div class="form-group" id="editBlacklistReasonGroup" style="display: none;">
+                    <label for="BlacklistReason">Raison de la blacklist</label>
+                    <input type="text" asp-for="Supplier.BlacklistReason" id="editBlacklistReason" />
+                </div>
+                <button type="submit" class="modal-submit-btn">Modifier</button>
             </form>
         </div>
     </div>
@@ -183,7 +239,6 @@
             <tr>
                 <th>ID</th>
                 <th>Nom de l'entreprise</th>
-
                 <th>Blacklisté</th>
                 <th>Raison de la blacklist</th>
                 <th>Actions</th>
@@ -195,15 +250,12 @@
                 <tr>
                     <td>@supplier.Id</td>
                     <td>@supplier.CompanyName</td>
-
                     <td>@(supplier.IsBlacklisted ? "Oui" : "Non")</td>
                     <td>@supplier.BlacklistReason</td>
                     <td>
                         <div class="action-buttons">
-                            <form method="post" asp-page-handler="Update" asp -route-id="@supplier.Id">
-                                <button type="submit" class="btn-warning">Modifier</button>
-                            </form>
-                            <form method="post" asp-page-handler="Delete" asp-route-id="@supplier.Id">
+                            <button type="button" class="btn-warning" onclick="openEditModal(@supplier.Id, '@supplier.CompanyName', @supplier.IsBlacklisted.ToString().ToLower(), '@supplier.BlacklistReason')">Modifier</button>
+                            <form method="post" asp-page-handler="Delete" asp-route-id="@supplier.Id" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce fournisseur ?');">
                                 <button type="submit" class="btn-danger">Supprimer</button>
                             </form>
                             <form method="post" asp-page-handler="Blacklist" asp-route-id="@supplier.Id">
@@ -233,17 +285,56 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <script>
-    function openModal() {
-        document.getElementById("supplierModal").style.display = "block";
+    // Add Modal Functions
+    function openAddModal() {
+        document.getElementById("addSupplierModal").style.display = "block";
     }
 
-    function closeModal() {
-        document.getElementById("supplierModal").style.display = "none";
+    function closeAddModal() {
+        document.getElementById("addSupplierModal").style.display = "none";
     }
 
+    function toggleBlacklistReason(select) {
+        const blacklistReasonGroup = document.getElementById("blacklistReasonGroup");
+        if (select.value === "true") {
+            blacklistReasonGroup.style.display = "block";
+        } else {
+            blacklistReasonGroup.style.display = "none";
+        }
+    }
+
+    // Edit Modal Functions
+    function openEditModal(id, companyName, isBlacklisted, blacklistReason) {
+        document.getElementById("editSupplierModal").style.display = "block";
+        document.getElementById("editSupplierId").value = id;
+        document.getElementById("editCompanyName").value = companyName;
+        document.getElementById("editIsBlacklisted").value = isBlacklisted.toString();
+        toggleEditBlacklistReason(document.getElementById("editIsBlacklisted"));
+        if (isBlacklisted) {
+            document.getElementById("editBlacklistReason").value = blacklistReason;
+        }
+    }
+
+    function closeEditModal() {
+        document.getElementById("editSupplierModal").style.display = "none";
+    }
+
+    function toggleEditBlacklistReason(select) {
+        const editBlacklistReasonGroup = document.getElementById("editBlacklistReasonGroup");
+        if (select.value === "true") {
+            editBlacklistReasonGroup.style.display = "block";
+        } else {
+            editBlacklistReasonGroup.style.display = "none";
+        }
+    }
+
+    // Close modals when clicking outside
     window.onclick = function (event) {
-        if (event.target == document.getElementById("supplierModal")) {
-            closeModal();
+        if (event.target == document.getElementById("addSupplierModal")) {
+            closeAddModal();
+        }
+        if (event.target == document.getElementById("editSupplierModal")) {
+            closeEditModal();
         }
     }
 </script>
