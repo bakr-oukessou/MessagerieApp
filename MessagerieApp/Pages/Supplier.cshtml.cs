@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MessagerieApp.Models;
-using MessagerieApp.Services;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using MessagerieApp.Business.Interfaces.TransversalData;
 
 namespace MessagerieApp.Pages
 {
-    public class SupplierModel : PageModel
+	public class SupplierModel : PageModel
     {
         private readonly ISupplierService _supplierService;
 
@@ -16,11 +16,11 @@ namespace MessagerieApp.Pages
         }
 
         // List of suppliers to display
-        public IEnumerable<Supplier> Suppliers { get; set; }
+        public IEnumerable<Fournisseur> Suppliers { get; set; }
 
         // Properties for creating/editing a supplier
         [BindProperty]
-        public Supplier Supplier { get; set; }
+        public Fournisseur Supplier { get; set; }
 
         // Load suppliers on page load
         public async Task OnGetAsync()

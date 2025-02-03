@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MessagerieApp.Models;
 using MessagerieApp.Repositories;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
 using System.Text;
+using MessagerieApp.Models.TransversalData;
 
 namespace MessagerieApp.Pages
 {
@@ -36,7 +36,7 @@ namespace MessagerieApp.Pages
 			}
 
 			// Créer le fournisseur
-			var supplier = new Supplier { CompanyName = Registration.CompanyName };
+			var supplier = new Fournisseur { CompanyName = Registration.CompanyName };
 			await _supplierRepo.AddSupplierAsync(supplier);
 
 			// Créer l'utilisateur associé

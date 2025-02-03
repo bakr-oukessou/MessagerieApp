@@ -1,12 +1,12 @@
-﻿using MessagerieApp.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using MessagerieApp.Business.Interfaces;
-using MessagerieApp.Repository.Interfaces;
+using MessagerieApp.Business.Interfaces.MasterData;
+using MessagerieApp.Models.MasterData;
+using MessagerieApp.Repository.Interfaces.MasterData;
 
 namespace MessagerieApp.Services
 {
-    public class RessourceService : IRessourceService
+	public class RessourceService : IRessourceService
     {
         private readonly IRessourceRepository _ressourceRepository;
 
@@ -65,7 +65,7 @@ namespace MessagerieApp.Services
             throw new NotImplementedException();
         }
 
-        public async Task AddRessourceFromDemandeAsync(DemandeRessourceItem item)
+        public async Task AddRessourceFromDemandeAsync(RessourceItem item)
         {
             await _ressourceRepository.AddRessourceFromDemandeAsync(item);
         }

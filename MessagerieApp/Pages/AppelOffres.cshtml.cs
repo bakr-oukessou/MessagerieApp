@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MessagerieApp.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using MessagerieApp.Business.Interfaces.TransactionData;
 
 namespace MessagerieApp.Pages
 {
-    public class AppelOffreModel : PageModel
+	public class AppelOffreModel : PageModel
     {
         private readonly INotificationService _notificationService;
 

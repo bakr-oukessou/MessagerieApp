@@ -1,13 +1,13 @@
-﻿using MessagerieApp.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using MessagerieApp.Business;
-using MessagerieApp.Business.Interfaces;
-using MessagerieApp.Repository.Interfaces;
+using MessagerieApp.Business.Interfaces.TransversalData;
+using MessagerieApp.Models.TransversalData;
+using MessagerieApp.Repository.Interfaces.TransversalData;
 
 namespace MessagerieApp.Services
 {
-    public class UserService : IUserService
+	public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
 

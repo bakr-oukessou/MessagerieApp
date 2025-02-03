@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MessagerieApp.Models;
 using MessagerieApp.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MessagerieApp.Business.Interfaces;
+using MessagerieApp.Models.TransversalData;
+using MessagerieApp.Business.Interfaces.TransversalData;
 
 namespace MessagerieApp.Pages
 {
-    public class UsersModel : PageModel
+	public class UsersModel : PageModel
     {
         private readonly IUserService _userService;
 

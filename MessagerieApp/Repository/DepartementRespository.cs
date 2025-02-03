@@ -1,11 +1,12 @@
 ﻿using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using MessagerieApp.Models;
+using MessagerieApp.Models.MasterData;
+using MessagerieApp.Repository.Interfaces.MasterData;
 
 namespace MessagerieApp.Repositories
 {
-    public class DepartementRepository : IDepartementRepository
+	public class DepartementRepository : IDepartementRepository
     {
         private readonly string _connectionString;
 

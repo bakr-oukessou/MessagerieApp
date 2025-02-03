@@ -1,7 +1,7 @@
-using MessagerieApp.Business.Interfaces;
-using MessagerieApp.Models;
+using MessagerieApp.Business.Interfaces.MasterData;
+using MessagerieApp.Models.MasterData;
 using MessagerieApp.Repositories;
-using MessagerieApp.Repository.Interfaces;
+using MessagerieApp.Repository.Interfaces.TransactionData;
 using MessagerieApp.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MessagerieApp.Pages
 {
-    public class RessourceModel : PageModel
+	public class RessourceModel : PageModel
     {
         private readonly IRessourceService _ressourceService;
         private readonly IDemandeRessourceRepository _demandeRessourceRepository;
@@ -25,7 +25,7 @@ namespace MessagerieApp.Pages
         public DemandeRessource NewDemandeRessource { get; set; } = new DemandeRessource();
 
         [BindProperty]
-        public List<DemandeRessourceItem> NewDemandeRessourceItems { get; set; } = new List<DemandeRessourceItem>();
+        public List<RessourceItem> NewDemandeRessourceItems { get; set; } = new List<RessourceItem>();
 
         public List<DemandeRessource> Demandes { get; set; } = new List<DemandeRessource>();
 

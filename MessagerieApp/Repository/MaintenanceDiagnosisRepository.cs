@@ -1,11 +1,12 @@
 ﻿using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using MessagerieApp.Models;
+using MessagerieApp.Models.TransactionData;
+using MessagerieApp.Repository.Interfaces.TransactionData;
 
 namespace MessagerieApp.Repositories
 {
-    public class MaintenanceDiagnosisRepository : IMaintenanceDiagnosisRepository
+	public class MaintenanceDiagnosisRepository : IMaintenanceDiagnosisRepository
     {
         private readonly string _connectionString;
 

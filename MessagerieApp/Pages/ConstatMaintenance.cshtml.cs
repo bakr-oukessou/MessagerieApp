@@ -1,10 +1,10 @@
-using MessagerieApp.Models;
+using MessagerieApp.Models.TransactionData;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace MessagerieApp.Pages
 {
-    public class ConstatMaintenanceModel : PageModel
+	public class ConstatMaintenanceModel : PageModel
     {
         public List<ConstatMaintenance> ConstatMaintenanceList { get; set; } = new List<ConstatMaintenance>();
 

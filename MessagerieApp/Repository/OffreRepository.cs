@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
-using MessagerieApp.Models;
-using MessagerieApp.Repository.Interfaces;
+using MessagerieApp.Models.TransactionData;
+using MessagerieApp.Repository.Interfaces.TransactionData;
 using Microsoft.Extensions.Configuration;
 
 namespace MessagerieApp.Repository
 {
-    public class OffreRepository : IOffreRepository
+	public class OffreRepository : IOffreRepository
     {
         private readonly string _connectionString;
 

@@ -25,7 +25,8 @@
 
             @if (isAdmin || isResponsable || isChef)
             {
-                <li class="nav-item">
+				<li class="nav-item">
+					<a href="c:\users\geams\onedrive\bureau\messagerieapp\messagerieapp\pages\shared\_sidebar.cshtml">c:\users\geams\onedrive\bureau\messagerieapp\messagerieapp\pages\shared\_sidebar.cshtml</a>
                     <a class="nav-link text-white" href="#" data-page="Ressource">
                         <i class="fas fa-desktop"></i>Ressources
                     </a>
@@ -65,6 +66,25 @@
                     <a class="nav-link text-white" href="#" data-page="Users">
                         <i class="fas fa-user"></i>Utilisateurs
                     </a>
+                </li>
+            }
+
+            @if (User.IsInRole("Enseignant"))
+            {
+                <li class="nav-item">
+                    <a class="nav-link" asp-page="/DemandeRessource">Mes Demandes de Ressources</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-page="/Notifications">Notifications</a>
+                </li>
+            }
+            @if (User.IsInRole("ChefDepartement"))
+            {
+                <li class="nav-item">
+                    <a class="nav-link" asp-page="/ValidationDemandes">Validation des Demandes</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-page="/Statistiques">Statistiques</a>
                 </li>
             }
         </ul>

@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MessagerieApp.Services;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using MessagerieApp.Business.Interfaces.TransactionData;
 
 namespace MessagerieApp.Pages
 {
-    public class CreateBesoinModel : PageModel
+	public class CreateBesoinModel : PageModel
     {
         private readonly INotificationService _notificationService;
 

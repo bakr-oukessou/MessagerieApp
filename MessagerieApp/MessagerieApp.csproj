@@ -12,11 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\MasterData\" />
-    <Folder Include="Models\NewFolder\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="wwwroot\images\background.jpg" />
   </ItemGroup>
 

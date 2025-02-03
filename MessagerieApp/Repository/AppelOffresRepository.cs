@@ -1,9 +1,9 @@
 ﻿using MessagerieApp.Models;
-using MessagerieApp.Repository.Interfaces;
+using MessagerieApp.Repository.Interfaces.TransactionData;
 
 namespace MessagerieApp.Repository
 {
-    public class AppelOffresRepository : IAppelOffresRepository
+	public class AppelOffresRepository : IAppelOffresRepository
     {
         private readonly List<AppelOffres> _appelOffresList = new List<AppelOffres>();
 

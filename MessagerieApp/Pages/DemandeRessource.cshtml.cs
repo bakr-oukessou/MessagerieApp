@@ -4,62 +4,91 @@ using MessagerieApp.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using MessagerieApp.Business.Interfaces.TransactionData;
+using MessagerieApp.Business.Interfaces.TransversalData;
+using MessagerieApp.Models.TransactionData;
 
 namespace MessagerieApp.Pages
 {
-    public class DemandeRessourceModel : PageModel
-    {
-        private readonly IDemandeRessourceService _demandeRessourceService;
+	public class DemandeRessourceModel : PageModel
+	{
+		private readonly IDemandeRessourceService _demandeRessourceService;
+		private readonly IUserService _userService;
 
-        public DemandeRessourceModel(IDemandeRessourceService demandeRessourceService)
-        {
-            _demandeRessourceService = demandeRessourceService;
-        }
+		public DemandeRessourceModel(
+			IDemandeRessourceService demandeRessourceService,
+			IUserService userService)
+		{
+			_demandeRessourceService = demandeRessourceService;
+			_userService = userService;
+		}
 
-        // List of resource requests to display
-        public IEnumerable<DemandeRessource> Demandes { get; set; }
+		[BindProperty]
+		public string Instruction { get; set; }
 
-        // Properties for creating a new resource request
-        [BindProperty]
-        public int DepartmentId { get; set; }
+		[BindProperty]
+		public DemandeRessource NouvelleDemande { get; set; }
 
-        [BindProperty]
-        public DateTime RequestDate { get; set; }
+		public bool EstEnseignant { get; set; }
+		public bool EstChefDepartement { get; set; }
+		public IEnumerable<DemandeRessource> Demandes { get; set; }
 
-        [BindProperty]
-        public string Status { get; set; }
+		public async Task OnGetAsync()
+		{
+			var user = await _userService.GetUserByIdAsync(int.Parse(User.FindFirst("sub").Value));
 
-        // Load resource requests on page load
-        public async Task OnGetAsync()
-        {
-            Demandes = await _demandeRessourceService.GetAllDemandesAsync();
-        }
+			EstEnseignant = await _userService.EstEnseignant(user.Id);
+			EstChefDepartement = await _userService.EstChefDepartement(user.Id);
 
-        // Handle form submission to create a new resource request
-        public async Task<IActionResult> OnPostAsync()
-        {
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
+			if (EstChefDepartement)
+			{
+				Demandes = await _demandeRessourceService.ObtenirHistoriqueDemandes(user.DepartmentId.Value);
+			}
+			else if (EstEnseignant)
+			{
+				Demandes = await _demandeRessourceService.GetDemandesParUtilisateurAsync(user.Id);
+			}
+		}
 
-            var demande = new DemandeRessource
-            {
-                DepartmentId = DepartmentId,
-                RequestDate = RequestDate,
-                Status = Status
-            };
+		public async Task<IActionResult> OnPostInitierDemandeAsync()
+		{
+			var user = await _userService.GetUserByIdAsync(int.Parse(User.FindFirst("sub").Value));
+			if (!await _userService.EstChefDepartement(user.Id))
+				return Forbid();
 
-            await _demandeRessourceService.AddDemandeAsync(demande);
+			await _demandeRessourceService.InitierDemandeAuxEnseignants(user.Id, user.DepartmentId.Value);
+			return RedirectToPage();
+		}
 
-            return RedirectToPage("/DemandeRessource"); // Refresh the page
-        }
+		public async Task<IActionResult> OnPostCreerDemandeAsync()
+		{
+			var user = await _userService.GetUserByIdAsync(int.Parse(User.FindFirst("sub").Value));
+			if (!await _userService.EstEnseignant(user.Id))
+				return Forbid();
 
-        // Update the status of a resource request
-        public async Task<IActionResult> OnPostUpdateStatusAsync(int id, string status)
-        {
-            await _demandeRessourceService.UpdateDemandeStatusAsync(id, status);
-            return RedirectToPage("/DemandeRessource");
-        }
-    }
+			NouvelleDemande.DepartmentId = user.DepartmentId.Value;
+			await _demandeRessourceService.CreerDemandeAsync(NouvelleDemande);
+			return RedirectToPage();
+		}
+
+		public async Task<IActionResult> OnPostValiderDemandeAsync(int id)
+		{
+			var user = await _userService.GetUserByIdAsync(int.Parse(User.FindFirst("sub").Value));
+			if (!await _userService.EstChefDepartement(user.Id))
+				return Forbid();
+
+			await _demandeRessourceService.ValiderDemandeAsync(id, user.Id, "Demande approuvée");
+			return RedirectToPage();
+		}
+
+		public async Task<IActionResult> OnPostRejeterDemandeAsync(int id)
+		{
+			var user = await _userService.GetUserByIdAsync(int.Parse(User.FindFirst("sub").Value));
+			if (!await _userService.EstChefDepartement(user.Id))
+				return Forbid();
+
+			await _demandeRessourceService.RejeterDemandeAsync(id, user.Id, "Demande rejetée");
+			return RedirectToPage();
+		}
+	}
 }

@@ -1,10 +1,11 @@
-﻿using MessagerieApp.Repositories;
-using MessagerieApp.Models;
+﻿using MessagerieApp.Models;
 using System.Threading.Tasks;
+using MessagerieApp.Repository.Interfaces.TransversalData;
+using MessagerieApp.Business.Interfaces.TransversalData;
 
 namespace MessagerieApp.Services
 {
-    public class SupplierService : ISupplierService
+	public class SupplierService : ISupplierService
     {
         private readonly ISupplierRepository _supplierRepository;
 

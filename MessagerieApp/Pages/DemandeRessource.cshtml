@@ -1,62 +1,117 @@
-﻿@page
-@model MessagerieApp.Pages.DemandeRessourceModel
-@{
-    ViewData["Title"] = "Demandes de Ressources";
+﻿<div class="container">
+    <!-- Section Chef de Département -->
+    @if (Model.EstChefDepartement)
+    {
+        <div class="card mb-4">
+            <div class="card-header bg-warning">
+                <h3>✉️ Envoyer une Demande Initiale</h3>
+            </div>
+            <div class="card-body">
+                <form method="post" asp-page-handler="InitierDemande">
+                    <div class="form-group">
+                        <label>Instructions pour les enseignants</label>
+                        <textarea class="form-control" asp-for="Instruction" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-warning mt-2">
+                        <i class="fas fa-paper-plane"></i> Envoyer aux Enseignants
+                    </button>
+                </form>
+            </div>
+        </div>
+    }
+
+    <!-- Section Enseignant -->
+    @if (Model.EstEnseignant)
+    {
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h3>➕ Nouvelle Demande de Ressources</h3>
+            </div>
+            <div class="card-body">
+                <form method="post" asp-page-handler="CreerDemande">
+                    <div class="form-group">
+                        <label>Titre de la demande</label>
+                        <input type="text" class="form-control" asp-for="NouvelleDemande.Titre" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Description détaillée</label>
+                        <textarea class="form-control" asp-for="NouvelleDemande.Contenu" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-2">
+                        <i class="fas fa-check"></i> Soumettre la Demande
+                    </button>
+                </form>
+            </div>
+        </div>
+    }
+
+    <!-- Liste des Demandes -->
+    <div class="card">
+        <div class="card-header bg-secondary text-white">
+            <h3>📋 Liste des Demandes</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Titre</th>
+                            <th>Département</th>
+                            <th>Statut</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var demande in Model.Demandes)
+                        {
+                            <tr class="@GetStatusRowClass(demande.Statut)">
+                                <td>@demande.Id</td>
+                                <td>@demande.Titre</td>
+                                <td>@(demande.Departement?.Nom ?? "N/A")</td>
+                                <td>@GetStatusBadge(demande.Statut)</td>
+                                <td>@demande.DateCreation.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    @if (Model.EstChefDepartement && demande.Statut == "EnAttente")
+                                    {
+                                        <div class="btn-group">
+                                            <form method="post" asp-page-handler="ValiderDemande" asp-route-id="@demande.Id">
+                                                <button type="submit" class="btn btn-sm btn-success">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </form>
+                                            <form method="post" asp-page-handler="RejeterDemande" asp-route-id="@demande.Id">
+                                                <button type="submit" class="btn btn-sm btn-danger ml-1">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetStatusRowClass(string statut) => statut switch
+    {
+        "Validee" => "table-success",
+        "Rejetee" => "table-danger",
+        "EnAttente" => "table-warning",
+        _ => ""
+    };
+
+    string GetStatusBadge(string statut) => statut switch
+    {
+        "Validee" => "<span class='badge badge-success'>Validée</span>",
+        "Rejetee" => "<span class='badge badge-danger'>Rejetée</span>",
+        "EnAttente" => "<span class='badge badge-warning'>En Attente</span>",
+        _ => "<span class='badge badge-secondary'>Inconnu</span>"
+    };
 }
-
-<h2>Demandes de Ressources</h2>
-
-<!-- Form to create a new resource request -->
-<form method="post">
-    <div class="form-group">
-        <label for="DepartmentId">ID du Département</label>
-        <input type="number" class="form-control" asp-for="DepartmentId" />
-    </div>
-    <div class="form-group">
-        <label for="RequestDate">Date de Demande</label>
-        <input type="date" class="form-control" asp-for="RequestDate" />
-    </div>
-    <div class="form-group">
-        <label for="Status">Statut</label>
-        <select class="form-control" asp-for="Status">
-            <option value="Draft">Brouillon</option>
-            <option value="Submitted">Soumis</option>
-            <option value="Approved">Approuvé</option>
-            <option value="Rejected">Rejeté</option>
-        </select>
-    </div>
-    <button type="submit" class="btn btn-primary">Créer une Demande</button>
-</form>
-
-<!-- List of resource requests -->
-<h3>Liste des Demandes</h3>
-<table class="table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>ID du Département</th>
-            <th>Date de Demande</th>
-            <th>Statut</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var demande in Model.Demandes)
-        {
-            <tr>
-                <td>@demande.Id</td>
-                <td>@demande.DepartmentId</td>
-                <td>@demande.RequestDate.ToShortDateString()</td>
-                <td>@demande.Status</td>
-                <td>
-                    <form method="post" asp-page-handler="UpdateStatus" asp-route-id="@demande.Id" asp-route-status="Approved">
-                        <button type="submit" class="btn btn-success">Approuver</button>
-                    </form>
-                    <form method="post" asp-page-handler="UpdateStatus" asp-route-id="@demande.Id" asp-route-status="Rejected">
-                        <button type="submit" class="btn btn-danger">Rejeter</button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
