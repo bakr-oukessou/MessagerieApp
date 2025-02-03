@@ -5,6 +5,7 @@ using MessagerieApp.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MessagerieApp.Business.Interfaces;
+using System.Data;
 
 namespace MessagerieApp.Pages
 {
@@ -25,15 +26,40 @@ namespace MessagerieApp.Pages
             return Page();
         }
 
-        public async Task<IActionResult> OnPostEditAsync(int id)
+        public async Task<IActionResult> OnPostEditAsync(int id, string email, string username, Departement department, string role)
         {
-            return RedirectToPage("/EditUser", new { id });
+            var user = await _userService.GetUserByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // Update user properties
+            user.Email = email;
+            user.UserName = username;
+            user.Department = department ;
+            user.Role = role;
+
+            // Save changes to the database
+            await _userService.UpdateUserAsync(user);
+
+            return RedirectToPage();
+
         }
 
         public async Task<IActionResult> OnPostDeleteAsync(int id)
         {
-            await _userService.DeleteUserAsync(id);
-            TempData["SuccessMessage"] = "Utilisateur supprimé avec succès.";
+            try
+            {
+                await _userService.DeleteUserAsync(id);
+            }
+            catch
+            {
+                TempData["ErrorMessage"] = "Erreur lors de la suppression.";
+                return RedirectToPage();
+            }
+
+            TempData["SuccessMessage"] = "supprimé avec succès.";
             return RedirectToPage();
         }
     }
