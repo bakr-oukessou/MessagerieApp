@@ -1,0 +1,35 @@
+﻿@page
+@model MessagerieApp.Pages.RegisterSupplierModel
+@{
+    ViewData["Title"] = "Inscription Fournisseur";
+}
+
+<div class="auth-container">
+    <form method="post" class="auth-form">
+        <h1>Inscription Fournisseur</h1>
+
+        <div class="form-group">
+            <label asp-for="Registration.CompanyName">Nom de la société *</label>
+            <input asp-for="Registration.CompanyName" class="form-control" />
+            <span asp-validation-for="Registration.CompanyName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Registration.Email">Email *</label>
+            <input asp-for="Registration.Email" class="form-control" />
+            <span asp-validation-for="Registration.Email" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Registration.Password">Mot de passe *</label>
+            <input asp-for="Registration.Password" type="password" class="form-control" />
+            <span asp-validation-for="Registration.Password" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">S'inscrire</button>
+
+        <p class="mt-3">
+            Déjà inscrit ? <a href="/Login">Se connecter</a>
+        </p>
+    </form>
+</div>
