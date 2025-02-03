@@ -21,6 +21,24 @@
 <body>
     <div class="container-fluid">
         <div class="row">
+            <!-- Sidebar -->
+            <partial name="_Sidebar" />
+            <!-- Main Content -->
+            <div class="col-md-9 p-4" id="main-content">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+    <!-- Toast Container -->
+    <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 1050;">
+        <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="4000">
+            <div class="toast-header bg-success text-white">
+                <strong class="me-auto">Succès</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                L'élément a été ajouté avec succès.
+            </div>
             @if (showSidebar)
             {
                 <!-- Afficher la sidebar uniquement si l'utilisateur est authentifié et que ce n'est pas Login/Register -->
@@ -37,11 +55,44 @@
                 </div>
             }
         </div>
+        <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="4000">
+            <div class="toast-header bg-danger text-white">
+                <strong class="me-auto">Erreur</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                Une erreur s'est produite lors de la procedure.
+            </div>
+        </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="~/js/site.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Check if TempData contains a success message
+            var successMessage = '@TempData["SuccessMessage"]';
+            var errorMessage = '@TempData["ErrorMessage"]';
+            if (successMessage) {
+                // Update the toast body with the success message
+                $('#successToast .toast-body').text(successMessage);
+
+                // Show the toast
+                var toast = new bootstrap.Toast(document.getElementById('successToast'));
+                toast.show();
+            }
+            else if(errorMessage){
+                // Update the toast body with the error message
+                $('#errorToast .toast-body').text(errorMessage);
+
+                // Show the toast
+                var toast = new bootstrap.Toast(document.getElementById('errorToast'));
+                toast.show();
+            }
+        });
+    </script>   
+
 </body>
 </html>
