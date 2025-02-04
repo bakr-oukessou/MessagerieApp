@@ -3,6 +3,7 @@ using MessagerieApp.Models;
 using MessagerieApp.Services;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using MessagerieApp.Business.Interfaces;
 
 namespace MessagerieApp.Pages
 {
@@ -49,13 +50,34 @@ namespace MessagerieApp.Pages
 
         public async Task<IActionResult> OnPostDeleteAsync(int id)
         {
-            await _supplierService.DeleteSupplierAsync(id);
-            return RedirectToPage("/Supplier");
+                try
+                {
+                    await _supplierService.DeleteSupplierAsync(id);
+                }
+                catch
+                {
+                    TempData["ErrorMessage"] = "Erreur lors de la suppression.";
+                    return RedirectToPage();
+                }
+
+                TempData["SuccessMessage"] = "supprimé avec succès.";
+                return RedirectToPage();
+       
+            
         }
 
         public async Task<IActionResult> OnPostBlacklistAsync(int id, string reason)
         {
+            try
+            {
             await _supplierService.BlacklistSupplierAsync(id, reason);
+
+            }catch
+            {
+                TempData["ErrorMessage"] = "Erreur.";
+                return RedirectToPage();
+            }
+            TempData["SuccessMessage"] = "Fournisseur blacklisted";
             return RedirectToPage("/Supplier");
         }
 

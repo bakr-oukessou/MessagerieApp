@@ -22,7 +22,7 @@ namespace MessagerieApp.Repositories
 			using (var connection = new SqlConnection(_connectionString))
 			{
 				await connection.OpenAsync();
-				var command = new SqlCommand("SELECT * FROM Fournisseur", connection);
+				var command = new SqlCommand("SELECT * FROM Fournisseurs", connection);
 
 				using (var reader = await command.ExecuteReaderAsync())
 				{
@@ -48,7 +48,7 @@ namespace MessagerieApp.Repositories
 			using (var connection = new SqlConnection(_connectionString))
 			{
 				await connection.OpenAsync();
-				var command = new SqlCommand("SELECT * FROM Fournisseur WHERE Id = @Id", connection);
+				var command = new SqlCommand("SELECT * FROM Fournisseurs WHERE Id = @Id", connection);
 				command.Parameters.AddWithValue("@Id", id);
 
 				using (var reader = await command.ExecuteReaderAsync())
@@ -84,7 +84,7 @@ namespace MessagerieApp.Repositories
 			await connection.OpenAsync();
 
 			var command = new SqlCommand(
-				@"INSERT INTO Fournisseur (CompanyName, IsBlacklisted, BlacklistReason) 
+				@"INSERT INTO Fournisseurs (CompanyName, IsBlacklisted, BlacklistReason) 
         VALUES (@CompanyName, @IsBlacklisted, @BlacklistReason);
         SELECT SCOPE_IDENTITY();",
 				connection);
@@ -105,7 +105,7 @@ namespace MessagerieApp.Repositories
 			{
 				await connection.OpenAsync();
 				var command = new SqlCommand(
-					@"UPDATE Fournisseur 
+					@"UPDATE Fournisseurs 
                     SET CompanyName = @CompanyName, 
                         Location = @Location, 
 
@@ -129,7 +129,7 @@ namespace MessagerieApp.Repositories
 			using (var connection = new SqlConnection(_connectionString))
 			{
 				await connection.OpenAsync();
-				var command = new SqlCommand("DELETE FROM Fournisseur WHERE Id = @Id", connection);
+				var command = new SqlCommand("DELETE FROM Fournisseurs WHERE Id = @Id", connection);
 				command.Parameters.AddWithValue("@Id", id);
 
 				await command.ExecuteNonQueryAsync();
@@ -142,7 +142,7 @@ namespace MessagerieApp.Repositories
 			{
 				await connection.OpenAsync();
 				var command = new SqlCommand(
-					"UPDATE Fournisseur SET IsBlacklisted = 1, BlacklistReason = @BlacklistReason WHERE Id = @Id",
+					"UPDATE Fournisseurs SET IsBlacklisted = 1, BlacklistReason = @BlacklistReason WHERE Id = @Id",
 					connection);
 
 				command.Parameters.AddWithValue("@Id", id);
@@ -158,7 +158,7 @@ namespace MessagerieApp.Repositories
 			{
 				await connection.OpenAsync();
 				var command = new SqlCommand(
-					"UPDATE Fournisseur SET IsBlacklisted = 0, BlacklistReason = NULL WHERE Id = @Id",
+					"UPDATE Fournisseurs SET IsBlacklisted = 0, BlacklistReason = NULL WHERE Id = @Id",
 					connection);
 
 				command.Parameters.AddWithValue("@Id", id);
