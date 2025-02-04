@@ -13,22 +13,22 @@ namespace MessagerieApp.Services
             _supplierRepository = supplierRepository;
         }
 
-        public async Task<IEnumerable<Supplier>> GetAllSuppliersAsync()
+        public async Task<IEnumerable<Fournisseur>> GetAllSuppliersAsync()
         {
             return await _supplierRepository.GetAllSuppliersAsync();
         }
 
-        public async Task<Supplier> GetSupplierByIdAsync(int id)
+        public async Task<Fournisseur> GetSupplierByIdAsync(int id)
         {
             return await _supplierRepository.GetSupplierByIdAsync(id);
         }
 
-        public async Task AddSupplierAsync(Supplier supplier)
+        public async Task AddSupplierAsync(Fournisseur supplier)
         {
             await _supplierRepository.AddSupplierAsync(supplier);
         }
 
-        public async Task UpdateSupplierAsync(Supplier supplier)
+        public async Task UpdateSupplierAsync(Fournisseur supplier)
         {
             await _supplierRepository.UpdateSupplierAsync(supplier);
         }

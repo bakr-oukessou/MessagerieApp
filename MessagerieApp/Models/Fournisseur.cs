@@ -1,7 +1,7 @@
 ﻿using MessagerieApp.Models;
 using System.ComponentModel.DataAnnotations;
 
-public class Supplier
+public class Fournisseur
 {
 	public int Id { get; set; }
 

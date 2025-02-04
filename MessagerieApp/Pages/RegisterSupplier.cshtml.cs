@@ -36,7 +36,7 @@ namespace MessagerieApp.Pages
 			}
 
 			// Créer le fournisseur
-			var supplier = new Supplier { CompanyName = Registration.CompanyName };
+			var supplier = new Fournisseur { CompanyName = Registration.CompanyName };
 			await _supplierRepo.AddSupplierAsync(supplier);
 
 			// Créer l'utilisateur associé
@@ -47,8 +47,7 @@ namespace MessagerieApp.Pages
 				Email = Registration.Email,
 				Role = UserRole.Supplier,
 				SupplierId = supplier.Id,
-				PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(Registration.Password)),
-				PasswordSalt = hmac.Key
+				Password = hmac.ComputeHash(Encoding.UTF8.GetBytes(Registration.Password)),
 			};
 
 			await _userRepo.AddUserAsync(user);

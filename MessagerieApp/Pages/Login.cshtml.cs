@@ -39,14 +39,14 @@ namespace MessagerieApp.Pages
 				return Page();
 			}
 
-			// Vérification du mot de passe
-			if (!VerifyPasswordHash(LoginInput.Password, user.PasswordHash, user.PasswordSalt))
+			// Vérification directe du mot de passe en clair
+			if (user.Password != LoginInput.Password) // <- Modification ici
 			{
 				ErrorMessage = "Email ou mot de passe incorrect.";
 				return Page();
 			}
 
-			// Création des claims (données de l'utilisateur)
+			// Création des claims
 			var claims = new List<Claim>
 			{
 				new Claim(ClaimTypes.Name, user.UserName),
@@ -57,25 +57,15 @@ namespace MessagerieApp.Pages
 			var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 			var authProperties = new AuthenticationProperties
 			{
-				IsPersistent = true // Connexion persistante
+				IsPersistent = true
 			};
 
-			// Authentifier l'utilisateur avec les cookies
 			await HttpContext.SignInAsync(
 				CookieAuthenticationDefaults.AuthenticationScheme,
 				new ClaimsPrincipal(claimsIdentity),
 				authProperties);
 
 			return RedirectToPage("/Dashboard");
-		}
-
-		private bool VerifyPasswordHash(string password, byte[] storedHash, byte[] storedSalt)
-		{
-			using (var hmac = new System.Security.Cryptography.HMACSHA512(storedSalt))
-			{
-				var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-				return computedHash.SequenceEqual(storedHash);
-			}
 		}
 	}
 

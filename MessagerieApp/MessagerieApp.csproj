@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <Folder Include="Models\MasterData\" />
-    <Folder Include="Models\NewFolder\" />
+    <Folder Include="Models\TransactionData\" />
   </ItemGroup>
 
   <ItemGroup>

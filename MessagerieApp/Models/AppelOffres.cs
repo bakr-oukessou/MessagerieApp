@@ -13,7 +13,7 @@ namespace MessagerieApp.Models
         public decimal TotalPrice { get; set; }
         public string Status { get; set; } // Submitted, Accepted, Rejected
         public Offre Offre { get; set; }
-        public Supplier Fournisseur { get; set; }
+        public Fournisseur Fournisseur { get; set; }
         public List<AppelOffresItem> Items { get; set; }
     }
 }

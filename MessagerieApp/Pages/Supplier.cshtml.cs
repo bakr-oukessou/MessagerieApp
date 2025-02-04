@@ -16,11 +16,11 @@ namespace MessagerieApp.Pages
         }
 
         // List of suppliers to display
-        public IEnumerable<Supplier> Suppliers { get; set; }
+        public IEnumerable<Fournisseur> Suppliers { get; set; }
 
         // Properties for creating/editing a supplier
         [BindProperty]
-        public Supplier Supplier { get; set; }
+        public Fournisseur Supplier { get; set; }
 
         // Load suppliers on page load
         public async Task OnGetAsync()
