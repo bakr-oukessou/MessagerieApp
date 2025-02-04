@@ -47,9 +47,8 @@ namespace MessagerieApp.Pages
 				Email = Registration.Email,
 				Role = UserRole.Supplier,
 				SupplierId = supplier.Id,
-				PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(Registration.Password)),
-				PasswordSalt = hmac.Key
-			};
+				Password = Registration.Password
+            };
 
 			await _userRepo.AddUserAsync(user);
 

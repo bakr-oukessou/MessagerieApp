@@ -39,12 +39,7 @@ namespace MessagerieApp.Pages
 				return Page();
 			}
 
-			// Vérification du mot de passe
-			if (!VerifyPasswordHash(LoginInput.Password, user.PasswordHash, user.PasswordSalt))
-			{
-				ErrorMessage = "Email ou mot de passe incorrect.";
-				return Page();
-			}
+			
 
 			// Création des claims (données de l'utilisateur)
 			var claims = new List<Claim>

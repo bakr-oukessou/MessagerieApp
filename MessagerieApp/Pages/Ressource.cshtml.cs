@@ -27,11 +27,14 @@ namespace MessagerieApp.Pages
         [BindProperty]
         public List<DemandeRessourceItem> NewDemandeRessourceItems { get; set; } = new List<DemandeRessourceItem>();
 
-        public List<DemandeRessource> Demandes { get; set; } = new List<DemandeRessource>();
+        public List<Ressource> Demandes { get; set; } = new List<Ressource>();
 
-        public async Task OnGetAsync(int departmentId)
+        public async Task<IActionResult> OnGetAsync()
         {
-            Demandes = (await _demandeRessourceRepository.GetDemandesByDepartmentAsync(departmentId)).ToList();
+            Demandes = (List<Ressource>)await _ressourceService.GetAllRessourcesAsync();
+            
+            //Demandes = (await _demandeRessourceRepository.GetDemandesByDepartmentAsync(departmentId)).ToList();
+            return Page();
         }
 
         public async Task<IActionResult> OnPostCreateDemandeAsync()

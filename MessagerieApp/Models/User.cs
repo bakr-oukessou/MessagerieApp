@@ -18,10 +18,7 @@ namespace MessagerieApp.Models
 		public string Email { get; set; }
 
 		[Required]
-		public byte[] PasswordHash { get; set; }
-
-		[Required]
-		public byte[] PasswordSalt { get; set; }
+		public string Password { get; set; }
 
 		[Required]
 		public UserRole Role { get; set; }
@@ -32,8 +29,5 @@ namespace MessagerieApp.Models
 		public int? SupplierId { get; set; }
 		public virtual Supplier? Supplier { get; set; }
 
-		[NotMapped] // Champ non stocké en base
-		[DataType(DataType.Password)]
-		public string Password { get; set; }
 	}
 }

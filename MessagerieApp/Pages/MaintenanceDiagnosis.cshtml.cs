@@ -14,6 +14,7 @@ namespace MessagerieApp.Pages
         public MaintenanceDiagnosisModel(IMaintenanceDiagnosisService maintenanceDiagnosisService)
         {
             _maintenanceDiagnosisService = maintenanceDiagnosisService;
+            MaintenanceDiagnoses = new List<MaintenanceDiagnosis>();
         }
 
         // List of maintenance diagnoses to display

@@ -37,8 +37,7 @@ namespace MessagerieApp.Pages
             }
 
             // Hash the password (you should use a proper hashing library like BCrypt)
-            NewUser.PasswordHash = System.Text.Encoding.UTF8.GetBytes(NewUser.Password);
-            NewUser.PasswordSalt = new byte[0]; // Add proper salt generation
+            NewUser.Password = NewUser.Password;
 
             // Add the new user to the database
             await _userService.AddUserAsync(NewUser);

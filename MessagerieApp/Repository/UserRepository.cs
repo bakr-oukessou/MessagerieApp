@@ -33,9 +33,8 @@ namespace MessagerieApp.Repositories
 							UserName = reader.GetString(reader.GetOrdinal("UserName")),
 							Email = reader.GetString(reader.GetOrdinal("Email")),
 							Role = Enum.Parse<UserRole>(reader.GetString(reader.GetOrdinal("Role"))), // Conversion string → enum
-							PasswordHash = (byte[])reader["PasswordHash"],
-							PasswordSalt = (byte[])reader["PasswordSalt"],
-							DepartmentId = reader.IsDBNull(reader.GetOrdinal("DepartmentId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                            Password = reader.GetString(reader.GetOrdinal("Password")),
+                            DepartmentId = reader.IsDBNull(reader.GetOrdinal("DepartmentId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("DepartmentId")),
 							SupplierId = reader.IsDBNull(reader.GetOrdinal("SupplierId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("SupplierId"))
 						});
 					}
@@ -76,9 +75,8 @@ namespace MessagerieApp.Repositories
 							UserName = reader.GetString(reader.GetOrdinal("UserName")),
 							Email = reader.GetString(reader.GetOrdinal("Email")),
 							Role = Enum.Parse<UserRole>(reader.GetString(reader.GetOrdinal("Role"))),
-							PasswordHash = (byte[])reader["PasswordHash"],
-							PasswordSalt = (byte[])reader["PasswordSalt"],
-							DepartmentId = reader.IsDBNull(reader.GetOrdinal("DepartmentId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                            Password = reader.GetString(reader.GetOrdinal("Password")),
+                            DepartmentId = reader.IsDBNull(reader.GetOrdinal("DepartmentId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("DepartmentId")),
 							SupplierId = reader.IsDBNull(reader.GetOrdinal("SupplierId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("SupplierId"))
 						};
 					}
@@ -106,8 +104,7 @@ namespace MessagerieApp.Repositories
 							UserName = reader.GetString(reader.GetOrdinal("UserName")),
 							Email = reader.GetString(reader.GetOrdinal("Email")),
 							Role = Enum.Parse<UserRole>(reader.GetString(reader.GetOrdinal("Role"))),
-							PasswordHash = (byte[])reader["PasswordHash"],
-							PasswordSalt = (byte[])reader["PasswordSalt"],
+							Password = reader.GetString(reader.GetOrdinal("Password")),
 							DepartmentId = reader.IsDBNull(reader.GetOrdinal("DepartmentId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("DepartmentId")),
 							SupplierId = reader.IsDBNull(reader.GetOrdinal("SupplierId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("SupplierId"))
 						};
@@ -125,16 +122,15 @@ namespace MessagerieApp.Repositories
 				await connection.OpenAsync();
 				var command = new SqlCommand(
 					@"INSERT INTO Users 
-            (UserName, Email, PasswordHash, PasswordSalt, Role, DepartmentId, SupplierId) 
+            (UserName, Email, Password, Role, DepartmentId, SupplierId) 
             VALUES 
-            (@UserName, @Email, @PasswordHash, @PasswordSalt, @Role, @DepartmentId, @SupplierId);
+            (@UserName, @Email, @Password, @Role, @DepartmentId, @SupplierId);
             SELECT SCOPE_IDENTITY();",
 					connection);
 
 				command.Parameters.AddWithValue("@UserName", user.UserName);
 				command.Parameters.AddWithValue("@Email", user.Email);
-				command.Parameters.AddWithValue("@PasswordHash", user.PasswordHash);
-				command.Parameters.AddWithValue("@PasswordSalt", user.PasswordSalt);
+				command.Parameters.AddWithValue("@Password", user.Password);
 				command.Parameters.AddWithValue("@Role", user.Role.ToString());
 				command.Parameters.AddWithValue("@DepartmentId", (object)user.DepartmentId ?? DBNull.Value);
 				command.Parameters.AddWithValue("@SupplierId", (object)user.SupplierId ?? DBNull.Value);
@@ -152,7 +148,7 @@ namespace MessagerieApp.Repositories
 					@"UPDATE Users 
                     SET UserName = @UserName, Email = @Email, Role = @Role, 
                         DepartmentId = @DepartmentId, SupplierId = @SupplierId, 
-                        PasswordHash = @PasswordHash, PasswordSalt = @PasswordSalt 
+                        Password = @Password
                     WHERE Id = @Id",
 					connection);
 
@@ -162,8 +158,8 @@ namespace MessagerieApp.Repositories
 				command.Parameters.AddWithValue("@Role", user.Role.ToString());
 				command.Parameters.AddWithValue("@DepartmentId", user.DepartmentId ?? (object)DBNull.Value);
 				command.Parameters.AddWithValue("@SupplierId", user.SupplierId ?? (object)DBNull.Value);
-				command.Parameters.AddWithValue("@PasswordHash", user.PasswordHash);
-				command.Parameters.AddWithValue("@PasswordSalt", user.PasswordSalt);
+				command.Parameters.AddWithValue("@Password", user.Password);
+
 
 				await command.ExecuteNonQueryAsync();
 			}
@@ -201,8 +197,7 @@ namespace MessagerieApp.Repositories
 							UserName = reader.GetString(reader.GetOrdinal("UserName")),
 							Email = reader.GetString(reader.GetOrdinal("Email")),
 							Role = Enum.Parse<UserRole>(reader.GetString(reader.GetOrdinal("Role"))),
-							PasswordHash = (byte[])reader["PasswordHash"],
-							PasswordSalt = (byte[])reader["PasswordSalt"],
+							Password = reader.GetString(reader.GetOrdinal("Password")),
 							DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
 							SupplierId = reader.IsDBNull(reader.GetOrdinal("SupplierId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("SupplierId"))
 						});
@@ -234,35 +229,6 @@ namespace MessagerieApp.Repositories
                 return result.ToString();
             }
         }
-        //public async Task<User> GetUserRoleAsync(UserRole username)
-        //{
-        //    using (var connection = new SqlConnection(_connectionString))
-        //    {
-        //        await connection.OpenAsync();
-        //        var command = new SqlCommand("SELECT * FROM Users WHERE UserName = @UserName", connection);
-        //        command.Parameters.AddWithValue("@UserName", username);
-
-        //        using (var reader = await command.ExecuteReaderAsync())
-        //        {
-        //            if (await reader.ReadAsync())
-        //            {
-        //                return new User
-        //                {
-        //                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
-        //                    UserName = reader.GetString(reader.GetOrdinal("UserName")),
-        //                    Email = reader.GetString(reader.GetOrdinal("Email")),
-        //                    Role = Enum.Parse<UserRole>(reader.GetString(reader.GetOrdinal("Role"))),
-        //                    PasswordHash = (byte[])reader["PasswordHash"],
-        //                    PasswordSalt = (byte[])reader["PasswordSalt"],
-        //                    DepartmentId = reader.IsDBNull(reader.GetOrdinal("DepartmentId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-        //                    SupplierId = reader.IsDBNull(reader.GetOrdinal("SupplierId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("SupplierId"))
-        //                };
-        //            }
-        //        }
-        //    }
-
-        //    return null;
-        //}
 
     
     }
