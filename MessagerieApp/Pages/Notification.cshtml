@@ -126,10 +126,13 @@
 <div class="container">
     <h2>Notifications</h2>
 
-    <!-- Button to trigger the modal -->
-    <button type="button" class="btn btn-primary mb-4" data-toggle="modal" data-target="#createNotificationModal">
-        Créer une Notification
-    </button>
+    <!-- Button to trigger the modal (only for certain roles) -->
+    @if (Model.UserRole == "Enseignant" || Model.UserRole == "ChefDepartment" || Model.UserRole == "ResponsableRessource")
+    {
+        <button type="button" class="btn btn-primary mb-4" data-toggle="modal" data-target="#createNotificationModal">
+            Créer une Notification
+        </button>
+    }
 
     <!-- Modal for creating a new notification -->
     <div class="modal fade" id="createNotificationModal" tabindex="-1" role="dialog" aria-labelledby="createNotificationModalLabel" aria-hidden="true">
@@ -163,12 +166,21 @@
                         <div class="form-group">
                             <label for="Type">Type de Notification</label>
                             <select class="form-control" asp-for="NewNotification.Type" required>
-                                <option value="DemandeBesoins">DemandeBesoins</option>
-                                <option value="AppelOffre">AppelOffre</option>
-                                <option value="Maintenance">Maintenance</option>
-                                <option value="Livraison">Livraison</option>
-                                <option value="Rejet">Rejet</option>
-                                <option value="Acceptation">Acceptation</option>
+                                @if (Model.UserRole == "Enseignant")
+                                {
+                                    <option value="DemandeBesoins">DemandeBesoins</option>
+                                }
+                                @if (Model.UserRole == "ChefDepartment")
+                                {
+                                    <option value="DemandeBesoins">DemandeBesoins</option>
+                                    <option value="AppelOffre">AppelOffre</option>
+                                }
+                                @if (Model.UserRole == "ResponsableRessource")
+                                {
+                                    <option value="AppelOffre">AppelOffre</option>
+                                    <option value="Maintenance">Maintenance</option>
+                                    <option value="Livraison">Livraison</option>
+                                }
                             </select>
                         </div>
                         <div class="modal-footer">
@@ -211,9 +223,12 @@
                         <td>@notification.Statut</td>
                         <td>@notification.DateCreation.ToString("dd/MM/yyyy")</td>
                         <td class="notification-actions">
-                            <form method="post" asp-page-handler="MarkAsRead" asp-route-id="@notification.Id" class="d-inline">
-                                <button type="submit" class="btn btn-success btn-sm">Marquer comme Lu</button>
-                            </form>
+                            @if (notification.Statut == Models.StatutNotification.NonLue)
+                            {
+                                <form method="post" asp-page-handler="MarkAsRead" asp-route-id="@notification.Id" class="d-inline">
+                                    <button type="submit" class="btn btn-success btn-sm">Marquer comme Lu</button>
+                                </form>
+                            }
                             <form method="post" asp-page-handler="MarkAsArchived" asp-route-id="@notification.Id" class="d-inline">
                                 <button type="submit" class="btn btn-warning btn-sm">Archiver</button>
                             </form>
@@ -224,6 +239,7 @@
         </table>
     </div>
 </div>
+
 <!-- Toast Container -->
 <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 1050;">
     <div id="successToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
@@ -236,7 +252,6 @@
         </div>
     </div>
 </div>
-
 <!-- Bootstrap and jQuery scripts -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@2.9.2/dist/umd/popper.min.js"></script>

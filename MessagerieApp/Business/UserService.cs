@@ -45,5 +45,14 @@ namespace MessagerieApp.Services
         {
             await _userRepository.DeleteUserAsync(id);
         }
+
+        public async Task<string?> GetUserRoleAsync(string? role)
+        {
+            var userRole = await _userRepository.GetUserRoleAsync(role);
+
+            // If the role is null, return a default role (e.g., "Guest")
+            return userRole ?? "Guest";
+        }
+
     }
 }

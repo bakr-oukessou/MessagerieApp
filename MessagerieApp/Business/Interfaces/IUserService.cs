@@ -12,5 +12,6 @@ namespace MessagerieApp.Business.Interfaces
         Task AddUserAsync(User user);
         Task UpdateUserAsync(User user);
         Task DeleteUserAsync(int id);
+        Task<string?> GetUserRoleAsync(string? role);
     }
 }

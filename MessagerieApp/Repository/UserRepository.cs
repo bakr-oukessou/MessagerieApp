@@ -212,5 +212,58 @@ namespace MessagerieApp.Repositories
 
 			return utilisateurs;
 		}
-	}
+        public async Task<string> GetUserRoleAsync(string username)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                var command = new SqlCommand(
+                    "SELECT Role FROM Users WHERE Username = @Username",
+                    connection);
+
+                command.Parameters.AddWithValue("@Username", username);
+
+                var result = await command.ExecuteScalarAsync();
+
+                if (result == null)
+                {
+                    // Log an error or throw an exception
+                    throw new InvalidOperationException($"User '{username}' not found or has no role assigned.");
+                }
+
+                return result.ToString();
+            }
+        }
+        //public async Task<User> GetUserRoleAsync(UserRole username)
+        //{
+        //    using (var connection = new SqlConnection(_connectionString))
+        //    {
+        //        await connection.OpenAsync();
+        //        var command = new SqlCommand("SELECT * FROM Users WHERE UserName = @UserName", connection);
+        //        command.Parameters.AddWithValue("@UserName", username);
+
+        //        using (var reader = await command.ExecuteReaderAsync())
+        //        {
+        //            if (await reader.ReadAsync())
+        //            {
+        //                return new User
+        //                {
+        //                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+        //                    UserName = reader.GetString(reader.GetOrdinal("UserName")),
+        //                    Email = reader.GetString(reader.GetOrdinal("Email")),
+        //                    Role = Enum.Parse<UserRole>(reader.GetString(reader.GetOrdinal("Role"))),
+        //                    PasswordHash = (byte[])reader["PasswordHash"],
+        //                    PasswordSalt = (byte[])reader["PasswordSalt"],
+        //                    DepartmentId = reader.IsDBNull(reader.GetOrdinal("DepartmentId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+        //                    SupplierId = reader.IsDBNull(reader.GetOrdinal("SupplierId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("SupplierId"))
+        //                };
+        //            }
+        //        }
+        //    }
+
+        //    return null;
+        //}
+
+    
+    }
 }

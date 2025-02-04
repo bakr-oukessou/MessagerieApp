@@ -6,6 +6,7 @@
 		ResourceManager,
 		DepartmentHead,
 		Supplier,
-		MaintenanceStaff
+        Enseignant,
+        MaintenanceStaff
 	}
 }

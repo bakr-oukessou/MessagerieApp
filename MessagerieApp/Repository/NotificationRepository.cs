@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using MessagerieApp.Models;
+using System.Collections;
 
 namespace MessagerieApp.Repositories
 {
@@ -163,7 +164,43 @@ namespace MessagerieApp.Repositories
                 await command.ExecuteNonQueryAsync();
             }
         }
+       
+        public async Task<IEnumerable<Notification>> GetNotificationsByTypeAndUserAsync(NotificationType type, string userId)
+        {
+            var notifications = new List<Notification>();
 
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                var command = new SqlCommand(
+                    "SELECT * FROM Notifications WHERE Type = @Type AND (EmetteurId = @UserId OR DestinataireId = @UserId)",
+                    connection);
+
+                command.Parameters.AddWithValue("@Type", (int)type);
+                command.Parameters.AddWithValue("@UserId", userId);
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        notifications.Add(new Notification
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            EmetteurId = reader.GetInt32(reader.GetOrdinal("EmetteurId")),
+                            DestinataireId = reader.GetInt32(reader.GetOrdinal("DestinataireId")),
+                            Titre = reader.GetString(reader.GetOrdinal("Titre")),
+                            Corps = reader.GetString(reader.GetOrdinal("Corps")),
+                            Type = (NotificationType)reader.GetInt32(reader.GetOrdinal("Type")),
+                            Statut = (StatutNotification)reader.GetInt32(reader.GetOrdinal("Statut")),
+                            DateCreation = reader.GetDateTime(reader.GetOrdinal("DateCreation")),
+                            DateLecture = reader.IsDBNull(reader.GetOrdinal("DateLecture")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("DateLecture"))
+                        });
+                    }
+                }
+            }
+
+            return notifications;
+        }
         public async Task<IEnumerable<Notification>> GetNotificationsByUserAsync(int userId)
         {
             var notifications = new List<Notification>();
@@ -196,7 +233,6 @@ namespace MessagerieApp.Repositories
 
             return notifications;
         }
-
         public async Task<IEnumerable<Notification>> GetNotificationsByTypeAsync(NotificationType type)
         {
             var notifications = new List<Notification>();
@@ -204,7 +240,10 @@ namespace MessagerieApp.Repositories
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
-                var command = new SqlCommand("SELECT * FROM Notifications WHERE Type = @Type", connection);
+                var command = new SqlCommand(
+                    "SELECT * FROM Notifications WHERE Type = @Type",
+                    connection);
+
                 command.Parameters.AddWithValue("@Type", (int)type);
 
                 using (var reader = await command.ExecuteReaderAsync())
@@ -227,7 +266,44 @@ namespace MessagerieApp.Repositories
                 }
             }
 
-            return notifications;
+            return notifications; // Returns IEnumerable<Notification>
+        }
+        public async Task<IEnumerable<Notification>> GetNotificationsByTypesAsync(List<NotificationType> types)
+        {
+            var notifications = new List<Notification>();
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+
+                // Create a comma-separated list of types
+                var typeValues = string.Join(",", types.Select(t => (int)t));
+
+                var command = new SqlCommand(
+                    $"SELECT * FROM Notifications WHERE Type IN ({typeValues})",
+                    connection);
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        notifications.Add(new Notification
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            EmetteurId = reader.GetInt32(reader.GetOrdinal("EmetteurId")),
+                            DestinataireId = reader.GetInt32(reader.GetOrdinal("DestinataireId")),
+                            Titre = reader.GetString(reader.GetOrdinal("Titre")),
+                            Corps = reader.GetString(reader.GetOrdinal("Corps")),
+                            Type = (NotificationType)reader.GetInt32(reader.GetOrdinal("Type")),
+                            Statut = (StatutNotification)reader.GetInt32(reader.GetOrdinal("Statut")),
+                            DateCreation = reader.GetDateTime(reader.GetOrdinal("DateCreation")),
+                            DateLecture = reader.IsDBNull(reader.GetOrdinal("DateLecture")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("DateLecture"))
+                        });
+                    }
+                }
+            }
+
+            return notifications; // Returns IEnumerable<Notification>
         }
 
         public async Task<IEnumerable<Notification>> GetNotificationsByStatusAsync(StatutNotification status)
@@ -262,5 +338,7 @@ namespace MessagerieApp.Repositories
 
             return notifications;
         }
+
+        
     }
 }

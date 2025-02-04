@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using MessagerieApp.Models;
+﻿using MessagerieApp.Models;
 
 namespace MessagerieApp.Repositories
 {
@@ -14,7 +12,9 @@ namespace MessagerieApp.Repositories
         Task MarkNotificationAsReadAsync(int notificationId);
         Task MarkNotificationAsArchivedAsync(int notificationId);
         Task<IEnumerable<Notification>> GetNotificationsByUserAsync(int userId);
-        Task<IEnumerable<Notification>> GetNotificationsByTypeAsync(NotificationType type);
+        Task<IEnumerable<Notification>> GetNotificationsByTypesAsync(List<NotificationType> type);
         Task<IEnumerable<Notification>> GetNotificationsByStatusAsync(StatutNotification status);
+        Task<IEnumerable<Notification>> GetNotificationsByTypeAndUserAsync(NotificationType type, string userId);
+        Task <IEnumerable<Notification>> GetNotificationsByTypeAsync(NotificationType maintenance);
     }
 }

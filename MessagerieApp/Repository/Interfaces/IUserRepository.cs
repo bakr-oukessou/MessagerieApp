@@ -13,5 +13,9 @@ namespace MessagerieApp.Repository.Interfaces
         Task UpdateUserAsync(User user);
         Task DeleteUserAsync(int id);
         Task<IEnumerable<User>> GetUsersByDepartmentAsync(int departmentId);
+        //Task<User> GetUserRoleAsync(string username);
+        Task<string?> GetUserRoleAsync(string? role);
+
+
     }
 }
